@@ -163,3 +163,135 @@ Future versions of the platform may include:
 ## Conclusion
 
 The Women's Health Platform aims to improve women's access to health management tools, education, and support services through a user-friendly and modern digital system. The project demonstrates how technology can be used to enhance health awareness, improve accessibility, and empower women to make informed health decisions.
+
+## Things the app needs to have
+
+- Home / Landing Page
+- About Us
+- Contact Us
+- User Authentication
+  - Sign Up
+  - Login
+  - Logout
+  - Forgot Password / Password Recovery
+  - User Roles
+
+- User Profile
+  - Personal Information
+  - Health Profile
+  - Edit Profile
+  - Account Settings
+
+- Health Dashboard
+  - Personalized Health Overview
+  - Health Tracking Summary
+  - Recent Activities
+  - Upcoming Reminders
+
+- Menstrual Health
+  - Period Tracking
+  - Cycle Tracking
+  - Cycle History
+  - Period Predictions
+  - Symptom Tracking
+  - Mood Tracking
+  - Menstrual Calendar
+  - Cycle Reminders
+
+- Pregnancy
+  - Pregnancy Tracking
+  - Pregnancy Week Tracker
+  - Estimated Due Date
+  - Pregnancy Timeline
+  - Pregnancy Milestones
+  - Pregnancy Symptoms
+  - Pregnancy Appointments
+  - Pregnancy Reminders
+  - Pregnancy Health Information
+
+- Health & Symptom Tracking
+  - General Symptom Tracking
+  - Mood Tracking
+  - Health Records
+  - Personal Health History
+
+- Women's Health Information
+  - Health Articles
+  - Educational Resources
+  - Frequently Asked Questions
+  - Menstrual Health Information
+  - Pregnancy Information
+  - Reproductive Health Information
+  - Preventive Health Information
+  - Maternal Health Information
+
+- Healthcare Professionals
+  - Healthcare Professional Directory
+  - Professional Profiles
+  - Search for Healthcare Professionals
+  - Filter Professionals by Specialization
+  - Consultation Requests
+  - Appointment Booking
+  - Appointment History
+  - Professional Communication
+
+- Emergency Support
+  - Emergency Help Section
+  - Emergency Contacts
+  - Important Emergency Information
+  - Quick Access to Emergency Assistance
+  - Trusted Emergency Contact
+
+- Notifications & Reminders
+  - Period Reminders
+  - Pregnancy Reminders
+  - Appointment Reminders
+  - Health Reminders
+  - Important Notifications
+
+- Search Functionality
+  - Search Health Information
+  - Search Articles
+  - Search Healthcare Professionals
+  - Filter Search Results
+
+- Health Resources
+  - Articles
+  - Health Guides
+  - Videos / Educational Materials
+  - Health Tips
+  - FAQs
+
+- Community & Support
+  - Women's Health Discussions
+  - Community Support
+  - Questions & Answers
+  - Report / Moderation Features
+
+- Appointments
+  - Book Appointments
+  - View Upcoming Appointments
+  - Appointment History
+  - Appointment Reminders
+  - Cancel / Reschedule Appointments
+
+- Privacy & Security
+  - Secure User Accounts
+  - Privacy Settings
+  - Protection of Personal Information
+  - Health Data Privacy
+  - Secure Logout
+
+- Responsive Design
+  - Mobile-Friendly Interface
+  - Tablet-Friendly Interface
+  - Desktop-Friendly Interface
+
+- Admin Dashboard
+  - Manage Users
+  - Manage Healthcare Professionals
+  - Manage Health Resources
+  - Manage Articles
+  - Manage Appointments
+  - Manage Platform Content
+  - Monitor User Activity
