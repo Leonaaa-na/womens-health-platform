@@ -1,4 +1,4 @@
-import { Routes, Route } from "react-router-dom";
+import { Routes, Route,BrowserRouter } from "react-router-dom";
 
 import UnauthLayout from "../layouts/UnauthLayout";
 import AuthLayout from "../layouts/AuthLayout";
@@ -8,6 +8,7 @@ import { publicRoutes } from "./routes";
 
 function AppRoutes() {
   return (
+    <BrowserRouter>
     <Routes>
 
       {/* Unauthenticated Routes */}
@@ -29,6 +30,7 @@ function AppRoutes() {
       </Route>
 
     </Routes>
+    </BrowserRouter>
   );
 }
 

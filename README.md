@@ -295,3 +295,92 @@ The Women's Health Platform aims to improve women's access to health management 
   - Manage Appointments
   - Manage Platform Content
   - Monitor User Activity
+
+
+  Assignment — 21/08/2026
+
+Question 1
+
+Check how to pass data using the useNavigate hook.
+
+useNavigate is used to move from one route to another. Data can be passed using the state property.
+
+const navigate = useNavigate();
+navigate("/profile", {
+  state: { name: "John", age: 20 }
+});
+
+The receiving component can get the data using useLocation:
+
+const location = useLocation();
+console.log(location.state);
+
+Therefore, useNavigate passes the data, while useLocation receives it.
+
+⸻
+
+Question 2
+
+In simple terms, explain the processes a component goes through.
+
+I. Changes state and how
+
+State is data that can change in a component. We use useState to manage it.
+
+const [count, setCount] = useState(0);
+setCount(count + 1);
+
+When the state changes, React re-renders the component and updates the UI.
+
+II. Shows and goes away (mounts and unmounts)
+
+Mounting happens when a component appears on the UI.
+
+Unmounting happens when a component is removed from the UI.
+
+{show && <Profile />}
+
+When show is true, Profile is mounted. When show becomes false, it is unmounted.
+
+III. Things that trigger re-renders
+
+A component can re-render when:
+
+* Its state changes.
+* Its props change.
+* Its parent component re-renders.
+* A value from context that it uses changes.
+
+For example:
+
+setName("Peter");
+
+Changing the state causes React to re-render and update the UI.
+
+⸻
+
+Question 3
+
+For each use case, give an example.
+
+I. Example of a state change
+
+const [name, setName] = useState("John");
+setName("Peter");
+
+The state changes from "John" to "Peter", causing the UI to update.
+
+II. Example of mounting and unmounting
+
+{isVisible && <Message />}
+
+When isVisible is true, Message appears and mounts. When it is false, Message is removed and unmounts.
+
+III. Example of a re-render
+
+const [count, setCount] = useState(0);
+<button onClick={() => setCount(count + 1)}>
+  Increase
+</button>
+
+Clicking the button changes the state, causing React to re-render the component and display the new count.
