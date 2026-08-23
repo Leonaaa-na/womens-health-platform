@@ -1,6 +1,19 @@
+import { useNavigate } from "react-router-dom";
 import FormInput from "../components/FormInput";
 
 function Login() {
+  const navigate = useNavigate();
+
+  const handleLogin = (event: any) => {
+    event.preventDefault();
+
+    // Temporary authentication for the MVP
+    localStorage.setItem("isAuthenticated", "true");
+
+    // Go to the Period Tracker
+    navigate("/period-tracker");
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-16">
       <div className="mx-auto max-w-md">
@@ -19,7 +32,7 @@ function Login() {
         {/* Login Form */}
         <div className="rounded-2xl bg-white p-8 shadow-md">
 
-          <form className="space-y-6">
+          <form onSubmit={handleLogin} className="space-y-6">
 
             {/* Email */}
             <FormInput
