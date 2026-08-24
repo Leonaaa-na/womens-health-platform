@@ -1,16 +1,24 @@
+import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FormInput from "../components/FormInput";
 
 function Login() {
   const navigate = useNavigate();
 
-  const handleLogin = (event: any) => {
+  const [email, setEmail] = useState("");
+  const [password, setPassword] = useState("");
+
+  const handleLogin = (event: React.FormEvent) => {
     event.preventDefault();
 
-    // Temporary authentication for the MVP
+    if (!email || !password) {
+      return;
+    }
+
+    // Mark the user as authenticated
     localStorage.setItem("isAuthenticated", "true");
 
-    // Go to the Period Tracker
+    // Send the user to the authenticated area
     navigate("/period-tracker");
   };
 
@@ -32,7 +40,10 @@ function Login() {
         {/* Login Form */}
         <div className="rounded-2xl bg-white p-8 shadow-md">
 
-          <form onSubmit={handleLogin} className="space-y-6">
+          <form
+            onSubmit={handleLogin}
+            className="space-y-6"
+          >
 
             {/* Email */}
             <FormInput
@@ -40,6 +51,10 @@ function Login() {
               type="email"
               name="email"
               placeholder="Enter your email"
+              value={email}
+              onChange={(event) =>
+                setEmail(event.target.value)
+              }
             />
 
             {/* Password */}
@@ -48,10 +63,15 @@ function Login() {
               type="password"
               name="password"
               placeholder="Enter your password"
+              value={password}
+              onChange={(event) =>
+                setPassword(event.target.value)
+              }
             />
 
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
+
               <label className="flex items-center gap-2 text-sm text-gray-600">
                 <input
                   type="checkbox"
@@ -62,10 +82,14 @@ function Login() {
 
               <button
                 type="button"
+                onClick={() =>
+                  navigate("/forgot-password")
+                }
                 className="text-sm font-semibold text-pink-600 hover:text-pink-700"
               >
                 Forgot password?
               </button>
+
             </div>
 
             {/* Login Button */}
@@ -80,16 +104,21 @@ function Login() {
 
           {/* Sign Up Link */}
           <p className="mt-6 text-center text-sm text-gray-600">
+
             Don't have an account?{" "}
-            <a
-              href="/signup"
+
+            <button
+              type="button"
+              onClick={() => navigate("/signup")}
               className="font-semibold text-pink-600 hover:text-pink-700"
             >
               Sign Up
-            </a>
+            </button>
+
           </p>
 
         </div>
+
       </div>
     </div>
   );
