@@ -1,25 +1,35 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
 import FormInput from "../components/FormInput";
+import { useAuth } from "../context/AuthContext";
 
 function Login() {
   const navigate = useNavigate();
 
+  const {
+    login,
+    loading,
+    isError,
+    errMessage,
+  } = useAuth();
+
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
 
-  const handleLogin = (event: React.FormEvent) => {
+  const handleLogin = async (
+    event: React.FormEvent
+  ) => {
     event.preventDefault();
 
     if (!email || !password) {
       return;
     }
 
-    // Mark the user as authenticated
-    localStorage.setItem("isAuthenticated", "true");
+    const success = await login(email, password);
 
-    // Send the user to the authenticated area
-    navigate("/period-tracker");
+    if (success) {
+      navigate("/period-tracker");
+    }
   };
 
   return (
@@ -69,6 +79,13 @@ function Login() {
               }
             />
 
+            {/* Error Message */}
+            {isError && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                {errMessage}
+              </div>
+            )}
+
             {/* Remember Me & Forgot Password */}
             <div className="flex items-center justify-between">
 
@@ -95,9 +112,10 @@ function Login() {
             {/* Login Button */}
             <button
               type="submit"
-              className="w-full rounded-lg bg-pink-600 py-3 font-semibold text-white transition hover:bg-pink-700"
+              disabled={loading}
+              className="w-full rounded-lg bg-pink-600 py-3 font-semibold text-white transition hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Log In
+              {loading ? "Logging in..." : "Log In"}
             </button>
 
           </form>

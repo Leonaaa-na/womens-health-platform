@@ -1,8 +1,18 @@
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Sidebar() {
+  const navigate = useNavigate();
+  const { logout } = useAuth();
+
+  const handleLogout = () => {
+    logout();
+    navigate("/login");
+  };
+
   return (
     <aside className="min-h-screen w-64 bg-gray-900 px-5 py-8 text-white">
+
       {/* Logo / Title */}
       <div className="mb-10">
         <h2 className="text-2xl font-bold text-pink-400">
@@ -63,13 +73,17 @@ function Sidebar() {
 
       {/* Logout */}
       <div className="mt-10 border-t border-gray-700 pt-6">
+
         <button
           type="button"
+          onClick={handleLogout}
           className="w-full rounded-lg px-4 py-3 text-left text-gray-300 transition hover:bg-gray-800 hover:text-pink-400"
         >
           Logout
         </button>
+
       </div>
+
     </aside>
   );
 }

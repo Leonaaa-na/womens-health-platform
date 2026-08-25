@@ -52,7 +52,7 @@ function PeriodDashboard() {
     <div className="min-h-screen bg-pink-50 pb-24">
 
       {/* Header */}
-      <header className="bg-white px-5 pb-5 pt-8 shadow-sm">
+      <header className="bg-white px-5 pb-5 pt-8">
 
         <div className="mx-auto flex max-w-md items-center justify-between">
 
@@ -140,7 +140,12 @@ function PeriodDashboard() {
               Today's check-in
             </h2>
 
-            <button className="text-sm font-semibold text-pink-600">
+            <button
+              onClick={() =>
+                navigate("/period-tracker/flow")
+              }
+              className="text-sm font-semibold text-pink-600"
+            >
               View all
             </button>
 
@@ -319,7 +324,7 @@ function PeriodDashboard() {
           periodLength={savedPeriodLength}
         />
 
-        {/* Insights */}
+        {/* Reports & Insights */}
         <section className="rounded-3xl bg-white p-5 shadow-sm">
 
           <div className="flex items-center justify-between">
@@ -350,8 +355,59 @@ function PeriodDashboard() {
 
           </div>
 
-          <button className="mt-4 w-full rounded-xl bg-pink-600 py-3 text-sm font-semibold text-white">
+          <button
+            onClick={() =>
+              navigate("/period-tracker/reports")
+            }
+            className="mt-4 w-full rounded-xl bg-pink-600 py-3 text-sm font-semibold text-white transition hover:bg-pink-700"
+          >
             View cycle reports
+          </button>
+
+        </section>
+
+        {/* Partner Sharing */}
+        <section className="rounded-3xl bg-white p-5 shadow-sm">
+
+          <div className="flex items-center justify-between">
+
+            <div className="flex items-center gap-3">
+
+              <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-2xl">
+                🤝
+              </div>
+
+              <div>
+                <h2 className="font-bold text-gray-900">
+                  Partner Sharing
+                </h2>
+
+                <p className="mt-1 text-sm text-gray-500">
+                  Share selected cycle updates
+                </p>
+              </div>
+
+            </div>
+
+          </div>
+
+          <div className="mt-4 rounded-2xl bg-purple-50 p-4">
+
+            <p className="text-sm leading-6 text-gray-700">
+              Choose what you want to share with someone
+              you trust while keeping control of your
+              personal information.
+            </p>
+
+          </div>
+
+          <button
+            onClick={() =>
+              navigate("/period-tracker/partner-sharing")
+            }
+            className="mt-4 w-full rounded-xl border border-purple-200 bg-white py-3 text-sm font-semibold text-purple-600 transition hover:bg-purple-50"
+          >
+            Manage Partner Sharing
           </button>
 
         </section>
@@ -399,14 +455,21 @@ function PeriodDashboard() {
             Calendar
           </button>
 
-          <button className="flex flex-col items-center gap-1 text-xs text-gray-400">
+          <button
+            onClick={() =>
+              navigate("/period-tracker/reports")
+            }
+            className="flex flex-col items-center gap-1 text-xs text-gray-400"
+          >
             <span className="text-xl">
               📊
             </span>
             Reports
           </button>
 
-          <button className="flex flex-col items-center gap-1 text-xs text-gray-400">
+          <button
+            className="flex flex-col items-center gap-1 text-xs text-gray-400"
+          >
             <span className="text-xl">
               👤
             </span>

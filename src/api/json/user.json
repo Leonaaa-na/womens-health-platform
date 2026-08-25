@@ -1,0 +1,23 @@
+{
+  "success": true,
+  "message": "Login successful",
+  "data": {
+    "user": {
+      "id": 1,
+      "firstName": "Ama",
+      "lastName": "Mensah",
+      "email": "ama.mensah@example.com",
+      "username": "amamh",
+      "role": "user",
+      "isVerified": true,
+      "profile": {
+        "avatar": "/images/avatar.png",
+        "bio": "HerBloom community member"
+      }
+    },
+    "tokens": {
+      "accessToken": "herbloom-mock-access-token-123456",
+      "refreshToken": "herbloom-mock-refresh-token-789012"
+    }
+  }
+}

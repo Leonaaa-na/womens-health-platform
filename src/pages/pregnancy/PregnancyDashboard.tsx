@@ -68,8 +68,12 @@ function PregnancyDashboard() {
   return (
     <div className="min-h-screen bg-pink-50 pb-24">
 
-      {/* Header */}
+      {/* =========================
+          HEADER
+      ========================= */}
+
       <header className="bg-white px-5 pb-5 pt-8 shadow-sm">
+
         <div className="mx-auto flex max-w-md items-center justify-between">
 
           <div>
@@ -92,11 +96,15 @@ function PregnancyDashboard() {
           </button>
 
         </div>
+
       </header>
 
       <main className="mx-auto max-w-md space-y-5 px-5 py-6">
 
-        {/* Welcome */}
+        {/* =========================
+            WELCOME
+        ========================= */}
+
         <section>
           <p className="text-sm text-gray-500">
             Your pregnancy journey 🤍
@@ -107,7 +115,10 @@ function PregnancyDashboard() {
           </h2>
         </section>
 
-        {/* Pregnancy Progress */}
+        {/* =========================
+            PREGNANCY PROGRESS
+        ========================= */}
+
         <section className="rounded-3xl bg-pink-600 p-6 text-white shadow-lg">
 
           <div className="flex items-center justify-between">
@@ -164,7 +175,10 @@ function PregnancyDashboard() {
 
         </section>
 
-        {/* Due Date */}
+        {/* =========================
+            DUE DATE
+        ========================= */}
+
         <section className="rounded-3xl bg-white p-5 shadow-sm">
 
           <div className="flex items-center gap-4">
@@ -187,7 +201,10 @@ function PregnancyDashboard() {
 
         </section>
 
-        {/* Pregnancy Features */}
+        {/* =========================
+            PREGNANCY FEATURES
+        ========================= */}
+
         <section>
 
           <h2 className="mb-3 text-lg font-bold text-gray-900">
@@ -215,6 +232,50 @@ function PregnancyDashboard() {
 
               <p className="mt-1 text-sm text-gray-500">
                 See baby's growth
+              </p>
+            </button>
+
+            {/* Baby Movement */}
+            <button
+              onClick={() =>
+                navigate(
+                  "/pregnancy-tracker/baby-movement"
+                )
+              }
+              className="rounded-2xl bg-white p-5 text-left shadow-sm transition hover:shadow-md"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
+                👣
+              </div>
+
+              <h3 className="font-semibold text-gray-900">
+                Baby Movement
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Track baby's movements
+              </p>
+            </button>
+
+            {/* Contraction Timer */}
+            <button
+              onClick={() =>
+                navigate(
+                  "/pregnancy-tracker/contraction-timer"
+                )
+              }
+              className="rounded-2xl bg-white p-5 text-left shadow-sm transition hover:shadow-md"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
+                ⏱️
+              </div>
+
+              <h3 className="font-semibold text-gray-900">
+                Contraction Timer
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Time your contractions
               </p>
             </button>
 
@@ -262,28 +323,6 @@ function PregnancyDashboard() {
               </p>
             </button>
 
-            {/* Appointments */}
-            <button
-              onClick={() =>
-                navigate(
-                  "/pregnancy-tracker/appointments"
-                )
-              }
-              className="rounded-2xl bg-white p-5 text-left shadow-sm transition hover:shadow-md"
-            >
-              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
-                🗓️
-              </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Appointments
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Keep track of visits
-              </p>
-            </button>
-
             {/* Wellness */}
             <button
               onClick={() =>
@@ -328,11 +367,80 @@ function PregnancyDashboard() {
               </p>
             </button>
 
+            {/* Hospital & Birth Planning */}
+            <button
+              onClick={() =>
+                navigate(
+                  "/pregnancy-tracker/hospital-birth-planning"
+                )
+              }
+              className="rounded-2xl bg-white p-5 text-left shadow-sm transition hover:shadow-md"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
+                🏥
+              </div>
+
+              <h3 className="font-semibold text-gray-900">
+                Hospital & Birth Planning
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Plan for birth and hospital needs
+              </p>
+            </button>
+
+            {/* Pregnancy Education */}
+            <button
+              onClick={() =>
+                navigate(
+                  "/pregnancy-tracker/education"
+                )
+              }
+              className="rounded-2xl bg-white p-5 text-left shadow-sm transition hover:shadow-md"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
+                📚
+              </div>
+
+              <h3 className="font-semibold text-gray-900">
+                Pregnancy Education
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Learn about your pregnancy
+              </p>
+            </button>
+
+            {/* Postpartum Transition */}
+            <button
+              onClick={() =>
+                navigate(
+                  "/pregnancy-tracker/postpartum"
+                )
+              }
+              className="rounded-2xl bg-white p-5 text-left shadow-sm transition hover:shadow-md"
+            >
+              <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
+                🌷
+              </div>
+
+              <h3 className="font-semibold text-gray-900">
+                Postpartum Transition
+              </h3>
+
+              <p className="mt-1 text-sm text-gray-500">
+                Prepare for life after birth
+              </p>
+            </button>
+
           </div>
 
         </section>
 
-        {/* Weekly Insight */}
+        {/* =========================
+            WEEKLY INSIGHT
+        ========================= */}
+
         <section className="rounded-3xl bg-white p-5 shadow-sm">
 
           <div className="flex items-center justify-between">
@@ -366,7 +474,10 @@ function PregnancyDashboard() {
 
         </section>
 
-        {/* Back to Period Tracker */}
+        {/* =========================
+            BACK TO PERIOD TRACKER
+        ========================= */}
+
         <button
           onClick={() =>
             navigate("/period-tracker")
@@ -378,7 +489,10 @@ function PregnancyDashboard() {
 
       </main>
 
-      {/* Bottom Navigation */}
+      {/* =========================
+          BOTTOM NAVIGATION
+      ========================= */}
+
       <nav className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
 
         <div className="mx-auto flex max-w-md items-center justify-around px-3 py-3">
@@ -412,29 +526,29 @@ function PregnancyDashboard() {
           <button
             onClick={() =>
               navigate(
-                "/pregnancy-tracker/appointments"
+                "/pregnancy-tracker/baby-movement"
               )
             }
             className="flex flex-col items-center gap-1 text-xs text-gray-400"
           >
             <span className="text-xl">
-              🗓️
+              👣
             </span>
-            Appointments
+            Movement
           </button>
 
           <button
             onClick={() =>
               navigate(
-                "/pregnancy-tracker/symptoms"
+                "/pregnancy-tracker/contraction-timer"
               )
             }
             className="flex flex-col items-center gap-1 text-xs text-gray-400"
           >
             <span className="text-xl">
-              🩺
+              ⏱️
             </span>
-            Symptoms
+            Timer
           </button>
 
           <button
