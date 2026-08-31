@@ -10,12 +10,17 @@ function Footer() {
           {/* Brand */}
           <div>
             <h2 className="text-2xl font-bold text-pink-400">
-              Women's Health
+              HerBloom
             </h2>
 
+            <p className="mt-2 text-sm font-medium text-pink-300">
+              Her health. Her journey. Her bloom.
+            </p>
+
             <p className="mt-4 max-w-sm leading-7 text-gray-400">
-              Empowering women with accessible health information,
-              useful resources, and support throughout their health journey.
+              Supporting women with accessible health information,
+              useful resources, health tools, and support throughout
+              their health journey.
             </p>
           </div>
 
@@ -65,7 +70,7 @@ function Footer() {
             </h3>
 
             <div className="mt-4 space-y-3 text-gray-400">
-              <p>📧 support@womenshealthplatform.com</p>
+              <p>📧 support@herbloom.com</p>
               <p>📞 +233 00 000 0000</p>
               <p>📍 Ghana</p>
             </div>
@@ -80,11 +85,11 @@ function Footer() {
         <div className="flex flex-col items-center justify-between gap-4 text-sm text-gray-400 md:flex-row">
 
           <p>
-            © 2026 Women's Health Platform. All rights reserved.
+            ©️ 2026 HerBloom. All rights reserved.
           </p>
 
           <p>
-            Designed for women's health and well-being.
+            Her health. Her journey. Her bloom.
           </p>
 
         </div>

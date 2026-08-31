@@ -1,58 +1,51 @@
-import { Link, useNavigate } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useAuth } from "../context/AuthContext";
 
 function Sidebar() {
-  const navigate = useNavigate();
   const { logout } = useAuth();
 
   const handleLogout = () => {
     logout();
-    navigate("/login");
   };
 
   return (
     <aside className="min-h-screen w-64 bg-gray-900 px-5 py-8 text-white">
 
-      {/* Logo / Title */}
+      {/* HerBloom Brand */}
       <div className="mb-10">
-        <h2 className="text-2xl font-bold text-pink-400">
-          Women's Health
-        </h2>
+        <Link to="/period-tracker">
+          <h2 className="text-2xl font-bold text-pink-400">
+            HerBloom
+          </h2>
 
-        <p className="mt-1 text-sm text-gray-400">
-          Health Dashboard
-        </p>
+          <p className="mt-1 text-sm text-gray-400">
+            Her health. Her journey. Her bloom.
+          </p>
+        </Link>
       </div>
 
       {/* Navigation */}
       <nav className="space-y-2">
 
         <Link
-          to="/dashboard"
+          to="/period-tracker"
           className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
         >
-          Dashboard
+          Period Tracker
         </Link>
 
         <Link
-          to="/menstrual-health"
+          to="/pregnancy-tracker"
           className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
         >
-          Menstrual Health
+          Pregnancy Tracker
         </Link>
 
         <Link
-          to="/pregnancy"
+          to="/health-library"
           className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
         >
-          Pregnancy
-        </Link>
-
-        <Link
-          to="/health-resources"
-          className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
-        >
-          Health Resources
+          Health Library
         </Link>
 
         <Link
@@ -73,7 +66,6 @@ function Sidebar() {
 
       {/* Logout */}
       <div className="mt-10 border-t border-gray-700 pt-6">
-
         <button
           type="button"
           onClick={handleLogout}
@@ -81,7 +73,6 @@ function Sidebar() {
         >
           Logout
         </button>
-
       </div>
 
     </aside>

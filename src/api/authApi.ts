@@ -28,20 +28,43 @@ export interface AuthResponse {
   data: AuthData | null;
 }
 
+// Small delay to simulate an API request
+const delay = (ms: number) =>
+  new Promise((resolve) =>
+    setTimeout(resolve, ms)
+  );
+
+// LOGIN
 export const loginUser = async (
   email: string,
   password: string
 ): Promise<AuthResponse> => {
-  await new Promise((resolve) =>
-    setTimeout(resolve, 1000)
+  await delay(1000);
+
+  const savedAccount = localStorage.getItem(
+    "herbloomAccount"
   );
 
-  const validEmail = userData.data.user.email;
-  const validPassword = "HerBloom123";
+  let validUser = userData.data.user;
+  let validPassword = "HerBloom123";
 
+  // If the user has created an account,
+  // use that account for login.
+  if (savedAccount) {
+    try {
+      const account = JSON.parse(savedAccount);
+
+      validUser = account.user;
+      validPassword = account.password;
+    } catch {
+      localStorage.removeItem("herbloomAccount");
+    }
+  }
+
+  // Check email and password
   if (
     email.trim().toLowerCase() !==
-      validEmail.toLowerCase() ||
+      validUser.email.toLowerCase() ||
     password !== validPassword
   ) {
     return {
@@ -54,19 +77,26 @@ export const loginUser = async (
   return {
     success: true,
     message: "Login successful",
-    data: userData.data,
+    data: {
+      user: validUser,
+      tokens: {
+        accessToken:
+          "herbloom-access-token",
+        refreshToken:
+          "herbloom-refresh-token",
+      },
+    },
   };
 };
 
+// SIGN UP
 export const signUpUser = async (
   firstName: string,
   lastName: string,
   email: string,
   password: string
 ): Promise<AuthResponse> => {
-  await new Promise((resolve) =>
-    setTimeout(resolve, 1000)
-  );
+  await delay(1000);
 
   if (!password.trim()) {
     return {
@@ -76,26 +106,40 @@ export const signUpUser = async (
     };
   }
 
+  const newUser: User = {
+    id: 2,
+    firstName,
+    lastName,
+    email,
+    username: email.split("@")[0],
+    role: "user",
+    isVerified: true,
+    profile: {
+      avatar: "/images/avatar.png",
+      bio: "HerBloom community member",
+    },
+  };
+
+  // Save the newly created account
+  // so it can be used during login.
+  localStorage.setItem(
+    "herbloomAccount",
+    JSON.stringify({
+      user: newUser,
+      password,
+    })
+  );
+
   return {
     success: true,
     message: "Account created successfully",
     data: {
-      user: {
-        id: 2,
-        firstName,
-        lastName,
-        email,
-        username: email.split("@")[0],
-        role: "user",
-        isVerified: true,
-        profile: {
-          avatar: "/images/avatar.png",
-          bio: "HerBloom community member",
-        },
-      },
+      user: newUser,
       tokens: {
-        accessToken: "herbloom-signup-access-token",
-        refreshToken: "herbloom-signup-refresh-token",
+        accessToken:
+          "herbloom-signup-access-token",
+        refreshToken:
+          "herbloom-signup-refresh-token",
       },
     },
   };

@@ -34,17 +34,28 @@ function Login() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-16">
+
       <div className="mx-auto max-w-md">
 
-        {/* Heading */}
+        {/* HerBloom Branding */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900">
-            Welcome Back
+
+          <h1 className="text-4xl font-bold text-pink-600">
+            HerBloom
           </h1>
+
+          <p className="mt-2 text-sm font-medium text-gray-500">
+            Her health. Her journey. Her bloom.
+          </p>
+
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Welcome Back
+          </h2>
 
           <p className="mt-3 text-gray-600">
             Log in to continue managing your health journey.
           </p>
+
         </div>
 
         {/* Login Form */}
@@ -138,6 +149,7 @@ function Login() {
         </div>
 
       </div>
+
     </div>
   );
 }

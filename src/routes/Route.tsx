@@ -6,10 +6,6 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import { publicRoutes } from "./routes";
 
-/* =========================
-   PERIOD TRACKER
-========================= */
-
 import PeriodDashboard from "../pages/period/PeriodDashboard";
 import CycleSetup from "../pages/period/CycleSetup";
 import FlowTracker from "../pages/period/FlowTracker";
@@ -21,22 +17,19 @@ import PeriodNotes from "../pages/period/PeriodNotes";
 import ReportsInsights from "../pages/period/ReportsInsights";
 import PartnerSharing from "../pages/period/PartnerSharing";
 
-/* =========================
-   PREGNANCY TRACKER
-========================= */
-
 import PregnancyDashboard from "../pages/pregnancy/PregnancyDashboard";
 import PregnancySetup from "../pages/pregnancy/PregnancySetup";
 import BabyDevelopment from "../pages/pregnancy/BabyDevelopment";
-import BabyMovement from "../pages/pregnancy/BabyMovement";
-import ContractionTimer from "../pages/pregnancy/ContractionTimer";
 import PregnancySymptoms from "../pages/pregnancy/PregnancySymptoms";
 import PregnancyNutrition from "../pages/pregnancy/PregnancyNutrition";
 import PregnancyWellness from "../pages/pregnancy/PregnancyWellness";
 import PregnancyNotes from "../pages/pregnancy/PregnancyNotes";
-import HospitalBirthPlanning from "../pages/pregnancy/HospitalBirthPlanning";
-import PregnancyEducation from "../pages/pregnancy/PregnancyEducation";
-import PostpartumTransition from "../pages/pregnancy/PostpartumTransition";
+
+import HealthLibrary from "../pages/health/HealthLibrary";
+import HealthCategories from "../pages/health/HealthCategories";
+import HealthSearch from "../pages/health/HealthSearch";
+import HealthArticles from "../pages/health/HealthArticles";
+import HealthArticleDetails from "../pages/health/HealthArticleDetails";
 
 function AppRoutes() {
   return (
@@ -48,7 +41,6 @@ function AppRoutes() {
         ========================= */}
 
         <Route element={<UnauthLayout />}>
-
           {publicRoutes.map((route) => (
             <Route
               key={route.path}
@@ -56,7 +48,6 @@ function AppRoutes() {
               element={route.element}
             />
           ))}
-
         </Route>
 
         {/* =========================
@@ -64,7 +55,6 @@ function AppRoutes() {
         ========================= */}
 
         <Route element={<ProtectedRoute />}>
-
           <Route element={<AuthLayout />}>
 
             {/* =========================
@@ -141,16 +131,6 @@ function AppRoutes() {
             />
 
             <Route
-              path="/pregnancy-tracker/baby-movement"
-              element={<BabyMovement />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/contraction-timer"
-              element={<ContractionTimer />}
-            />
-
-            <Route
               path="/pregnancy-tracker/symptoms"
               element={<PregnancySymptoms />}
             />
@@ -170,23 +150,43 @@ function AppRoutes() {
               element={<PregnancyNotes />}
             />
 
+            {/* =========================
+                HEALTH LIBRARY
+            ========================= */}
+
             <Route
-              path="/pregnancy-tracker/hospital-birth-planning"
-              element={<HospitalBirthPlanning />}
+              path="/health-library"
+              element={<HealthLibrary />}
             />
 
             <Route
-              path="/pregnancy-tracker/education"
-              element={<PregnancyEducation />}
+              path="/health-library/categories"
+              element={<HealthCategories />}
+            />
+
+            {/* Category pages */}
+            <Route
+              path="/health-library/category/:category"
+              element={<HealthArticles />}
             />
 
             <Route
-              path="/pregnancy-tracker/postpartum"
-              element={<PostpartumTransition />}
+              path="/health-library/search"
+              element={<HealthSearch />}
+            />
+
+            <Route
+              path="/health-library/articles"
+              element={<HealthArticles />}
+            />
+
+            {/* Individual Article */}
+            <Route
+              path="/health-library/articles/:id"
+              element={<HealthArticleDetails />}
             />
 
           </Route>
-
         </Route>
 
       </Routes>

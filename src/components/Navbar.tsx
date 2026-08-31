@@ -14,12 +14,12 @@ function Navbar() {
     <nav className="border-b border-gray-200 bg-white shadow-sm">
       <div className="mx-auto flex max-w-7xl items-center justify-between px-6 py-4">
 
-        {/* Logo / Brand */}
+        {/* HerBloom Brand */}
         <Link
           to="/"
           className="text-2xl font-bold text-pink-600"
         >
-          Women's Health
+          HerBloom
         </Link>
 
         {/* Navigation Links */}

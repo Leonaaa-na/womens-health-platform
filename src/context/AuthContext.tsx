@@ -8,6 +8,7 @@ import {
 } from "react";
 
 import useApi from "../hooks/useApi";
+
 import {
   loginUser,
   signUpUser,
@@ -18,6 +19,8 @@ import {
 interface AuthContextType {
   user: User | null;
   isAuthenticated: boolean;
+  authLoading: boolean;
+
   loading: boolean;
   isError: boolean;
   errMessage: string;
@@ -52,6 +55,10 @@ export function AuthProvider({
 }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
 
+  // Checks whether we have finished loading
+  // the saved login information.
+  const [authLoading, setAuthLoading] = useState(true);
+
   const {
     loading,
     isError,
@@ -61,6 +68,7 @@ export function AuthProvider({
     request,
   } = useApi<AuthData>();
 
+  // Restore login after refreshing the page
   useEffect(() => {
     const savedUser = localStorage.getItem(
       "herbloomUser"
@@ -72,15 +80,21 @@ export function AuthProvider({
 
     if (savedUser && accessToken) {
       try {
-        setUser(JSON.parse(savedUser));
+        const parsedUser = JSON.parse(savedUser);
+
+        setUser(parsedUser);
       } catch {
         localStorage.removeItem("herbloomUser");
         localStorage.removeItem("herbloomAccessToken");
         localStorage.removeItem("herbloomRefreshToken");
       }
     }
+
+    // We are finished checking localStorage
+    setAuthLoading(false);
   }, []);
 
+  // LOGIN
   const login = useCallback(
     async (
       email: string,
@@ -119,6 +133,7 @@ export function AuthProvider({
     [request]
   );
 
+  // SIGN UP
   const signUp = useCallback(
     async (
       firstName: string,
@@ -164,22 +179,29 @@ export function AuthProvider({
     [request]
   );
 
+  // LOGOUT
   const logout = useCallback(() => {
     setUser(null);
 
     localStorage.removeItem("herbloomUser");
     localStorage.removeItem("herbloomAccessToken");
     localStorage.removeItem("herbloomRefreshToken");
+
+    // Also remove the old authentication key
+    localStorage.removeItem("isAuthenticated");
   }, []);
 
   const value: AuthContextType = {
     user,
     isAuthenticated: !!user,
+    authLoading,
+
     loading,
     isError,
     errMessage,
     isSuccess,
     successMessage,
+
     login,
     signUp,
     logout,

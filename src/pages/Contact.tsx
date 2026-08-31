@@ -7,8 +7,9 @@ function Contact() {
       {/* Hero Section */}
       <section className="bg-pink-50 px-6 py-16">
         <div className="mx-auto max-w-4xl text-center">
+
           <p className="text-sm font-semibold uppercase tracking-widest text-pink-600">
-            Get In Touch
+            HerBloom Support
           </p>
 
           <h1 className="mt-3 text-4xl font-bold text-gray-900 md:text-5xl">
@@ -19,6 +20,7 @@ function Contact() {
             Have a question, suggestion, or need more information?
             We'd love to hear from you.
           </p>
+
         </div>
       </section>
 
@@ -28,6 +30,7 @@ function Contact() {
 
           {/* Contact Information */}
           <div>
+
             <p className="text-sm font-semibold uppercase tracking-widest text-pink-600">
               Contact Information
             </p>
@@ -37,15 +40,16 @@ function Contact() {
             </h2>
 
             <p className="mt-5 leading-7 text-gray-600">
-              Whether you have a question about the platform, need help
-              using a feature, or have suggestions for improving our
-              services, feel free to reach out to us.
+              Whether you have a question about HerBloom, need help
+              using a feature, or have suggestions for improving the
+              platform, feel free to reach out to us.
             </p>
 
             <div className="mt-8 space-y-6">
 
               {/* Email */}
               <div className="flex items-start gap-4">
+
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-pink-100 text-2xl">
                   📧
                 </div>
@@ -56,13 +60,15 @@ function Contact() {
                   </h3>
 
                   <p className="mt-1 text-gray-600">
-                    support@womenshealthplatform.com
+                    support@herbloom.com
                   </p>
                 </div>
+
               </div>
 
               {/* Phone */}
               <div className="flex items-start gap-4">
+
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-pink-100 text-2xl">
                   📞
                 </div>
@@ -76,10 +82,12 @@ function Contact() {
                     +233 00 000 0000
                   </p>
                 </div>
+
               </div>
 
               {/* Location */}
               <div className="flex items-start gap-4">
+
                 <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-full bg-pink-100 text-2xl">
                   📍
                 </div>
@@ -93,6 +101,7 @@ function Contact() {
                     Ghana
                   </p>
                 </div>
+
               </div>
 
             </div>
@@ -170,6 +179,11 @@ function Contact() {
       {/* Bottom Message */}
       <section className="bg-pink-600 px-6 py-12">
         <div className="mx-auto max-w-3xl text-center">
+
+          <p className="mb-2 text-sm font-semibold uppercase tracking-widest text-pink-100">
+            Her health. Her journey. Her bloom.
+          </p>
+
           <h2 className="text-2xl font-bold text-white">
             Your Questions Matter
           </h2>
@@ -179,6 +193,7 @@ function Contact() {
             women's needs and continuously improves to provide better
             health support.
           </p>
+
         </div>
       </section>
 

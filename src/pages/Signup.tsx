@@ -68,18 +68,29 @@ function Signup() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-16">
+
       <div className="mx-auto max-w-2xl">
 
-        {/* Heading */}
+        {/* HerBloom Branding */}
         <div className="mb-8 text-center">
-          <h1 className="text-4xl font-bold text-gray-900">
-            Create Your Account
+
+          <h1 className="text-4xl font-bold text-pink-600">
+            HerBloom
           </h1>
 
+          <p className="mt-2 text-sm font-medium text-gray-500">
+            Her health. Her journey. Her bloom.
+          </p>
+
+          <h2 className="mt-6 text-3xl font-bold text-gray-900">
+            Create Your Account
+          </h2>
+
           <p className="mt-3 text-gray-600">
-            Join us and take the first step toward
+            Join HerBloom and take the first step toward
             better health management.
           </p>
+
         </div>
 
         {/* Sign Up Form */}
@@ -162,6 +173,7 @@ function Signup() {
 
             {/* Terms */}
             <div className="flex items-start gap-3">
+
               <input
                 type="checkbox"
                 id="terms"
@@ -179,6 +191,7 @@ function Signup() {
                 I agree to the platform's terms of
                 service and privacy policy.
               </label>
+
             </div>
 
             {/* Sign Up Button */}
@@ -196,6 +209,7 @@ function Signup() {
 
           {/* Login Link */}
           <p className="mt-6 text-center text-sm text-gray-600">
+
             Already have an account?{" "}
 
             <button
@@ -205,10 +219,13 @@ function Signup() {
             >
               Log In
             </button>
+
           </p>
 
         </div>
+
       </div>
+
     </div>
   );
 }

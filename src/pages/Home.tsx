@@ -1,4 +1,8 @@
+import { useNavigate } from "react-router-dom";
+
 function Home() {
+  const navigate = useNavigate();
+
   return (
     <div className="min-h-screen bg-white">
 
@@ -7,28 +11,41 @@ function Home() {
         <div className="mx-auto max-w-7xl text-center">
 
           <p className="mb-4 text-sm font-semibold uppercase tracking-widest text-pink-600">
-            Your Health. Your Well-being. Your Future.
+            Her health. Her journey. Her bloom.
           </p>
 
           <h1 className="mx-auto max-w-4xl text-4xl font-bold leading-tight text-gray-900 md:text-6xl">
-            Empowering Women Through
-            <span className="text-pink-600"> Better Health Management</span>
+            Welcome to{" "}
+            <span className="text-pink-600">
+              HerBloom
+            </span>
           </h1>
 
           <p className="mx-auto mt-6 max-w-2xl text-lg leading-8 text-gray-600">
-            A comprehensive platform designed to help women understand,
-            manage, and take control of their health through tracking,
-            education, professional support, and reliable health resources.
+            A supportive health platform designed to help women
+            understand, manage, and take control of their health
+            through tracking, education, reliable resources, and
+            professional support.
           </p>
 
           <div className="mt-8 flex flex-col justify-center gap-4 sm:flex-row">
-            <button className="rounded-lg bg-pink-600 px-7 py-3 font-semibold text-white transition hover:bg-pink-700">
+
+            <button
+              type="button"
+              onClick={() => navigate("/signup")}
+              className="rounded-lg bg-pink-600 px-7 py-3 font-semibold text-white transition hover:bg-pink-700"
+            >
               Get Started
             </button>
 
-            <button className="rounded-lg border border-pink-600 px-7 py-3 font-semibold text-pink-600 transition hover:bg-pink-100">
+            <button
+              type="button"
+              onClick={() => navigate("/about")}
+              className="rounded-lg border border-pink-600 px-7 py-3 font-semibold text-pink-600 transition hover:bg-pink-100"
+            >
               Learn More
             </button>
+
           </div>
 
         </div>
@@ -38,14 +55,19 @@ function Home() {
       <section className="px-6 py-16">
         <div className="mx-auto max-w-6xl text-center">
 
+          <p className="mb-3 text-sm font-semibold uppercase tracking-widest text-pink-600">
+            HerBloom
+          </p>
+
           <h2 className="text-3xl font-bold text-gray-900 md:text-4xl">
-            A Health Platform Built With Women in Mind
+            Your Health, Your Journey
           </h2>
 
-          <p className="mx-auto mt-5 max-w-3xl text-gray-600 leading-7">
-            Women's health involves many different stages and needs.
-            Our platform brings important health management and support
-            features together in one convenient place.
+          <p className="mx-auto mt-5 max-w-3xl leading-7 text-gray-600">
+            Women's health involves different stages, experiences,
+            and needs. HerBloom brings essential health tools,
+            education, support, and resources together in one
+            convenient place.
           </p>
 
         </div>
@@ -56,71 +78,90 @@ function Home() {
         <div className="mx-auto max-w-7xl">
 
           <div className="mb-12 text-center">
+
             <h2 className="text-3xl font-bold text-gray-900">
-              What We Offer
+              Explore HerBloom
             </h2>
 
             <p className="mt-3 text-gray-600">
-              Tools and resources designed to support your health journey.
+              Tools and resources to support you through every stage
+              of your health journey.
             </p>
+
           </div>
 
           <div className="grid gap-6 md:grid-cols-2 lg:grid-cols-4">
 
-            {/* Feature 1 */}
+            {/* Menstrual Health */}
             <div className="rounded-xl bg-white p-6 shadow-sm transition hover:shadow-md">
-              <div className="mb-4 text-3xl">🌸</div>
+
+              <div className="mb-4 text-3xl">
+                🌸
+              </div>
 
               <h3 className="text-xl font-semibold text-gray-900">
                 Menstrual Health
               </h3>
 
               <p className="mt-3 text-sm leading-6 text-gray-600">
-                Keep track of menstrual cycles, symptoms, moods, and
-                important cycle information.
+                Track cycles, symptoms, moods, medication,
+                nutrition, wellness, and important cycle information.
               </p>
+
             </div>
 
-            {/* Feature 2 */}
+            {/* Pregnancy */}
             <div className="rounded-xl bg-white p-6 shadow-sm transition hover:shadow-md">
-              <div className="mb-4 text-3xl">🤰</div>
+
+              <div className="mb-4 text-3xl">
+                🤰
+              </div>
 
               <h3 className="text-xl font-semibold text-gray-900">
                 Pregnancy Support
               </h3>
 
               <p className="mt-3 text-sm leading-6 text-gray-600">
-                Access useful pregnancy information and keep track of
-                important stages and milestones.
+                Follow pregnancy milestones, symptoms, nutrition,
+                wellness, and other important pregnancy information.
               </p>
+
             </div>
 
-            {/* Feature 3 */}
+            {/* Health Library */}
             <div className="rounded-xl bg-white p-6 shadow-sm transition hover:shadow-md">
-              <div className="mb-4 text-3xl">📚</div>
+
+              <div className="mb-4 text-3xl">
+                📚
+              </div>
 
               <h3 className="text-xl font-semibold text-gray-900">
-                Health Education
+                Health Library
               </h3>
 
               <p className="mt-3 text-sm leading-6 text-gray-600">
-                Learn about important women's health topics using
-                accessible and informative resources.
+                Explore reliable health information, articles,
+                medical sources, and educational resources.
               </p>
+
             </div>
 
-            {/* Feature 4 */}
+            {/* Professional Support */}
             <div className="rounded-xl bg-white p-6 shadow-sm transition hover:shadow-md">
-              <div className="mb-4 text-3xl">🩺</div>
+
+              <div className="mb-4 text-3xl">
+                🩺
+              </div>
 
               <h3 className="text-xl font-semibold text-gray-900">
                 Professional Support
               </h3>
 
               <p className="mt-3 text-sm leading-6 text-gray-600">
-                Connect with healthcare professionals and access
-                support when you need it.
+                Find healthcare professionals and access support
+                when you need it.
               </p>
+
             </div>
 
           </div>
@@ -131,16 +172,24 @@ function Home() {
       <section className="bg-pink-600 px-6 py-16">
         <div className="mx-auto max-w-4xl text-center">
 
-          <h2 className="text-3xl font-bold text-white md:text-4xl">
-            Take Charge of Your Health
+          <p className="text-sm font-semibold uppercase tracking-widest text-pink-100">
+            Her health. Her journey. Her bloom.
+          </p>
+
+          <h2 className="mt-3 text-3xl font-bold text-white md:text-4xl">
+            Begin Your HerBloom Journey
           </h2>
 
           <p className="mx-auto mt-4 max-w-2xl text-pink-100">
-            Start your journey toward better health awareness,
-            management, and support.
+            Create your account and take the next step toward
+            understanding and managing your health.
           </p>
 
-          <button className="mt-7 rounded-lg bg-white px-7 py-3 font-semibold text-pink-600 transition hover:bg-pink-50">
+          <button
+            type="button"
+            onClick={() => navigate("/signup")}
+            className="mt-7 rounded-lg bg-white px-7 py-3 font-semibold text-pink-600 transition hover:bg-pink-50"
+          >
             Create Your Account
           </button>
 
