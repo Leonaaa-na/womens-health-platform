@@ -415,7 +415,7 @@ function PregnancyDashboard() {
             <button
               onClick={() =>
                 navigate(
-                  "/pregnancy-tracker/postpartum"
+                  "/pregnancy-tracker/postpartum-transition"
                 )
               }
               className="rounded-2xl bg-white p-5 text-left shadow-sm transition hover:shadow-md"

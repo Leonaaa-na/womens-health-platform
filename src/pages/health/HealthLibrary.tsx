@@ -1,4 +1,5 @@
-import { Link } from "react-router-dom";
+import { useState } from "react";
+import { Link, useNavigate } from "react-router-dom";
 
 const categories = [
   {
@@ -51,6 +52,20 @@ const categories = [
 ];
 
 function HealthLibrary() {
+  const navigate = useNavigate();
+
+  const [searchTerm, setSearchTerm] = useState("");
+
+  const handleSearch = () => {
+    const search = searchTerm.trim();
+
+    navigate(
+      search
+        ? `/health-library/search?q=${encodeURIComponent(search)}`
+        : "/health-library/search"
+    );
+  };
+
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="mx-auto max-w-7xl">
@@ -74,6 +89,7 @@ function HealthLibrary() {
 
         {/* Search */}
         <div className="mb-10 rounded-2xl bg-white p-6 shadow-sm">
+
           <label
             htmlFor="health-search"
             className="mb-3 block text-sm font-semibold text-gray-700"
@@ -82,19 +98,31 @@ function HealthLibrary() {
           </label>
 
           <div className="flex flex-col gap-3 sm:flex-row">
+
             <input
               id="health-search"
               type="text"
+              value={searchTerm}
+              onChange={(event) =>
+                setSearchTerm(event.target.value)
+              }
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSearch();
+                }
+              }}
               placeholder="Search articles, topics or health information..."
               className="flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
             />
 
             <button
               type="button"
+              onClick={handleSearch}
               className="rounded-lg bg-pink-600 px-6 py-3 font-semibold text-white transition hover:bg-pink-700"
             >
-              Search
+              🔎 Search
             </button>
+
           </div>
         </div>
 
@@ -145,6 +173,7 @@ function HealthLibrary() {
 
           {/* Trusted Information */}
           <div className="rounded-2xl bg-pink-600 p-6 text-white shadow-sm">
+
             <div className="mb-4 text-3xl">🔎</div>
 
             <h2 className="text-xl font-bold">
@@ -155,12 +184,14 @@ function HealthLibrary() {
               Medical information will be connected to
               its original, verifiable source.
             </p>
+
           </div>
 
         </div>
 
         {/* Categories */}
         <div>
+
           <div className="mb-6">
             <h2 className="text-2xl font-bold text-gray-900">
               Explore Categories
@@ -182,6 +213,7 @@ function HealthLibrary() {
                 )}`}
                 className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
               >
+
                 <div className="mb-4 text-3xl">
                   {category.icon}
                 </div>
@@ -197,6 +229,7 @@ function HealthLibrary() {
                 <span className="mt-4 inline-block text-sm font-semibold text-pink-600">
                   Explore →
                 </span>
+
               </Link>
             ))}
 
@@ -205,6 +238,7 @@ function HealthLibrary() {
 
         {/* Important Note */}
         <div className="mt-10 rounded-2xl border border-pink-100 bg-pink-50 p-6">
+
           <h2 className="font-bold text-gray-900">
             A note about our health information
           </h2>
@@ -217,6 +251,7 @@ function HealthLibrary() {
             experiences will be clearly labelled as personal
             stories rather than medical advice.
           </p>
+
         </div>
 
       </div>

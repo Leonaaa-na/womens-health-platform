@@ -1,77 +1,142 @@
-import { Link } from "react-router-dom";
-import { useAuth } from "../context/AuthContext";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 
 function Sidebar() {
-  const { logout } = useAuth();
+  const location = useLocation();
+  const navigate = useNavigate();
+
+  const isActive = (path: string) => {
+    return location.pathname === path;
+  };
 
   const handleLogout = () => {
-    logout();
+    localStorage.removeItem("isAuthenticated");
+    localStorage.removeItem("herbloomUser");
+    localStorage.removeItem("herbloomAccessToken");
+    localStorage.removeItem("herbloomRefreshToken");
+
+    navigate("/login");
   };
 
   return (
-    <aside className="min-h-screen w-64 bg-gray-900 px-5 py-8 text-white">
+    <aside className="flex min-h-screen w-64 flex-col border-r border-pink-200 bg-gradient-to-b from-pink-100 via-fuchsia-50 to-purple-100">
 
-      {/* HerBloom Brand */}
-      <div className="mb-10">
+      {/* Brand */}
+      <div className="border-b border-pink-200 px-6 py-7">
         <Link to="/period-tracker">
-          <h2 className="text-2xl font-bold text-pink-400">
+          <h1 className="text-3xl font-bold tracking-tight text-pink-600">
             HerBloom
-          </h2>
+          </h1>
 
-          <p className="mt-1 text-sm text-gray-400">
+          <p className="mt-1 text-xs font-medium text-purple-600">
             Her health. Her journey. Her bloom.
           </p>
         </Link>
       </div>
 
       {/* Navigation */}
-      <nav className="space-y-2">
+      <nav className="flex-1 space-y-2 px-4 py-6">
 
+        {/* Period Tracker */}
         <Link
           to="/period-tracker"
-          className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            isActive("/period-tracker")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
         >
-          Period Tracker
+          <span className="text-lg">🩸</span>
+          <span>Period Tracker</span>
         </Link>
 
+        {/* Pregnancy Tracker */}
         <Link
           to="/pregnancy-tracker"
-          className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            isActive("/pregnancy-tracker")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
         >
-          Pregnancy Tracker
+          <span className="text-lg">🤰</span>
+          <span>Pregnancy Tracker</span>
         </Link>
 
+        {/* Health Library */}
         <Link
           to="/health-library"
-          className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            location.pathname.startsWith("/health-library")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
         >
-          Health Library
+          <span className="text-lg">📚</span>
+          <span>Health Library</span>
         </Link>
 
+        {/* Healthcare Professionals */}
+        <Link
+          to="/healthcare-professionals"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            location.pathname.startsWith("/healthcare-professionals")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
+        >
+          <span className="text-lg">👩🏾‍⚕️</span>
+          <span>Healthcare Professionals</span>
+        </Link>
+
+        {/* Emergency Assistance */}
+        <Link
+          to="/emergency"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            location.pathname.startsWith("/emergency")
+              ? "bg-red-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-red-50 hover:text-red-700"
+          }`}
+        >
+          <span className="text-lg">🚨</span>
+          <span>Emergency Assistance</span>
+        </Link>
+
+        {/* Appointments */}
         <Link
           to="/appointments"
-          className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            isActive("/appointments")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
         >
-          Appointments
+          <span className="text-lg">📅</span>
+          <span>Appointments</span>
         </Link>
 
+        {/* Profile */}
         <Link
           to="/profile"
-          className="block rounded-lg px-4 py-3 transition hover:bg-gray-800 hover:text-pink-400"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            isActive("/profile")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
         >
-          Profile
+          <span className="text-lg">👤</span>
+          <span>Profile</span>
         </Link>
 
       </nav>
 
       {/* Logout */}
-      <div className="mt-10 border-t border-gray-700 pt-6">
+      <div className="border-t border-pink-200 p-4">
         <button
-          type="button"
           onClick={handleLogout}
-          className="w-full rounded-lg px-4 py-3 text-left text-gray-300 transition hover:bg-gray-800 hover:text-pink-400"
+          className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-white/70 hover:text-red-600"
         >
-          Logout
+          <span className="text-lg">🚪</span>
+          <span>Logout</span>
         </button>
       </div>
 

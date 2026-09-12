@@ -1,75 +1,46 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
-
-const articles = [
-  {
-    id: 1,
-    title: "Understanding Your Menstrual Cycle",
-    category: "Menstrual Health",
-    description:
-      "Learn about the different stages of the menstrual cycle and common changes.",
-  },
-  {
-    id: 2,
-    title: "What to Expect During Pregnancy",
-    category: "Pregnancy",
-    description:
-      "Explore common pregnancy changes and important aspects of prenatal care.",
-  },
-  {
-    id: 3,
-    title: "Understanding Fertility",
-    category: "Fertility",
-    description:
-      "Learn the basics of fertility and factors that can affect reproductive health.",
-  },
-  {
-    id: 4,
-    title: "Nutrition for Women's Health",
-    category: "Nutrition",
-    description:
-      "Explore the role of balanced nutrition in supporting women's health.",
-  },
-  {
-    id: 5,
-    title: "Mental Wellbeing During Pregnancy",
-    category: "Mental Wellbeing",
-    description:
-      "Learn about emotional wellbeing and mental health during pregnancy.",
-  },
-  {
-    id: 6,
-    title: "Sleep and Women's Health",
-    category: "Sleep",
-    description:
-      "Understand why quality sleep matters and explore healthy sleep habits.",
-  },
-  {
-    id: 7,
-    title: "Wellness and Exercise",
-    category: "Wellness & Exercise",
-    description:
-      "Explore healthy movement and everyday wellness.",
-  },
-  {
-    id: 8,
-    title: "Postpartum Recovery",
-    category: "Postpartum",
-    description:
-      "Learn about physical and emotional changes after pregnancy.",
-  },
-];
+import { Link, useSearchParams } from "react-router-dom";
+import { healthArticles } from "../../data/healthArticles";
 
 function HealthSearch() {
-  const [searchTerm, setSearchTerm] = useState("");
+  const [searchParams, setSearchParams] = useSearchParams();
 
-  const filteredArticles = articles.filter((article) => {
+  const initialSearch = searchParams.get("q") || "";
+
+  const [searchInput, setSearchInput] = useState(initialSearch);
+  const [searchTerm, setSearchTerm] = useState(initialSearch);
+
+  const handleSearch = () => {
+    const search = searchInput.trim();
+
+    setSearchTerm(search);
+
+    if (search) {
+      setSearchParams({ q: search });
+    } else {
+      setSearchParams({});
+    }
+  };
+
+  const handleClearSearch = () => {
+    setSearchInput("");
+    setSearchTerm("");
+    setSearchParams({});
+  };
+
+  const filteredArticles = healthArticles.filter((article) => {
+    if (!searchTerm) {
+      return true;
+    }
+
     const search = searchTerm.toLowerCase();
 
     return (
       article.title.toLowerCase().includes(search) ||
       article.category.toLowerCase().includes(search) ||
-      article.description.toLowerCase().includes(search)
+      article.summary.toLowerCase().includes(search) ||
+      article.content.toLowerCase().includes(search) ||
+      article.source.toLowerCase().includes(search)
     );
   });
 
@@ -81,7 +52,7 @@ function HealthSearch() {
         <div className="mb-8">
           <Link
             to="/health-library"
-            className="text-sm font-semibold text-pink-600 hover:text-pink-700"
+            className="text-sm font-semibold text-pink-600 transition hover:text-pink-700"
           >
             ← Back to Health Library
           </Link>
@@ -94,112 +65,191 @@ function HealthSearch() {
             Search Health Information
           </h1>
 
-          <p className="mt-3 text-gray-600">
-            Search for health topics, categories and articles.
+          <p className="mt-3 max-w-2xl text-gray-600">
+            Search trusted health information by topic,
+            category, article or medical source.
           </p>
         </div>
 
         {/* Search Box */}
         <div className="mb-10 rounded-2xl bg-white p-6 shadow-sm">
+
           <label
-            htmlFor="search"
+            htmlFor="health-search"
             className="mb-3 block text-sm font-semibold text-gray-700"
           >
             What would you like to learn about?
           </label>
 
           <div className="flex flex-col gap-3 sm:flex-row">
+
             <input
-              id="search"
+              id="health-search"
               type="text"
-              value={searchTerm}
+              value={searchInput}
               onChange={(event) =>
-                setSearchTerm(event.target.value)
+                setSearchInput(event.target.value)
               }
+              onKeyDown={(event) => {
+                if (event.key === "Enter") {
+                  handleSearch();
+                }
+              }}
               placeholder="Search pregnancy, fertility, nutrition..."
-              className="flex-1 rounded-lg border border-gray-300 px-4 py-3 outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
+              className="flex-1 rounded-lg border border-gray-300 px-4 py-3 text-gray-900 outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
             />
 
             <button
               type="button"
-              className="rounded-lg bg-pink-600 px-7 py-3 font-semibold text-white"
+              onClick={handleSearch}
+              className="rounded-lg bg-pink-600 px-7 py-3 font-semibold text-white transition hover:bg-pink-700"
             >
               🔎 Search
             </button>
+
           </div>
+
+          {searchTerm && (
+            <button
+              type="button"
+              onClick={handleClearSearch}
+              className="mt-3 text-sm font-semibold text-gray-500 transition hover:text-pink-600"
+            >
+              Clear Search
+            </button>
+          )}
+
         </div>
 
         {/* Results */}
         <div>
-          <div className="mb-5 flex items-center justify-between">
-            <h2 className="text-2xl font-bold text-gray-900">
-              {searchTerm
-                ? `Search Results`
-                : "Health Articles"}
-            </h2>
+
+          <div className="mb-5 flex flex-col gap-2 sm:flex-row sm:items-center sm:justify-between">
+
+            <div>
+              <h2 className="text-2xl font-bold text-gray-900">
+                {searchTerm
+                  ? "Search Results"
+                  : "Health Articles"}
+              </h2>
+
+              {searchTerm && (
+                <p className="mt-1 text-sm text-gray-500">
+                  Results for "{searchTerm}"
+                </p>
+              )}
+            </div>
 
             <span className="text-sm text-gray-500">
-              {filteredArticles.length} result
-              {filteredArticles.length !== 1 ? "s" : ""}
+              {filteredArticles.length}{" "}
+              {filteredArticles.length === 1
+                ? "result"
+                : "results"}
             </span>
+
           </div>
 
           {filteredArticles.length > 0 ? (
-            <div className="grid gap-5 md:grid-cols-2">
+
+            <div className="grid gap-6 md:grid-cols-2">
 
               {filteredArticles.map((article) => (
-                <div
+                <article
                   key={article.id}
                   className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
                 >
+
+                  {/* Category */}
                   <span className="inline-block rounded-full bg-pink-50 px-3 py-1 text-xs font-semibold text-pink-600">
                     {article.category}
                   </span>
 
+                  {/* Title */}
                   <h3 className="mt-4 text-xl font-bold text-gray-900">
                     {article.title}
                   </h3>
 
+                  {/* Summary */}
                   <p className="mt-3 text-sm leading-6 text-gray-600">
-                    {article.description}
+                    {article.summary}
                   </p>
 
-                  <button
-                    type="button"
-                    className="mt-5 font-semibold text-pink-600 hover:text-pink-700"
+                  {/* Source */}
+                  <div className="mt-5 rounded-lg bg-gray-50 p-4">
+
+                    <p className="text-xs font-semibold uppercase tracking-wide text-gray-500">
+                      Medical Source
+                    </p>
+
+                    <p className="mt-1 text-sm font-semibold text-gray-800">
+                      {article.source}
+                    </p>
+
+                    <p className="mt-1 text-xs text-gray-500">
+                      {article.author}
+                    </p>
+
+                  </div>
+
+                  {/* Read Article */}
+                  <Link
+                    to={`/health-library/articles/${article.id}`}
+                    className="mt-5 inline-block font-semibold text-pink-600 transition hover:text-pink-700"
                   >
                     Read Article →
-                  </button>
-                </div>
+                  </Link>
+
+                </article>
               ))}
 
             </div>
-          ) : (
-            <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
-              <div className="text-4xl">🔎</div>
 
-              <h2 className="mt-4 text-xl font-bold text-gray-900">
-                No results found
+          ) : (
+
+            /* No Results */
+            <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
+
+              <div className="text-5xl">
+                🔎
+              </div>
+
+              <h2 className="mt-4 text-2xl font-bold text-gray-900">
+                No Results Found
               </h2>
 
-              <p className="mt-2 text-gray-600">
-                Try searching for another health topic.
+              <p className="mx-auto mt-2 max-w-md text-gray-600">
+                We couldn't find any health information
+                matching "{searchTerm}".
               </p>
+
+              <button
+                type="button"
+                onClick={handleClearSearch}
+                className="mt-6 rounded-lg bg-pink-600 px-5 py-3 font-semibold text-white transition hover:bg-pink-700"
+              >
+                Clear Search
+              </button>
+
             </div>
+
           )}
+
         </div>
 
         {/* Information Notice */}
         <div className="mt-10 rounded-2xl border border-pink-100 bg-pink-50 p-6">
+
           <h2 className="font-bold text-gray-900">
             About our articles
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-gray-600">
-            Health articles will be connected to reliable,
-            verifiable medical sources. Original authors and
-            sources will be identified where available.
+            HerBloom's Health Library provides educational
+            information connected to reliable, verifiable
+            medical sources. Original authors and sources
+            are identified where available.
           </p>
+
         </div>
 
       </div>

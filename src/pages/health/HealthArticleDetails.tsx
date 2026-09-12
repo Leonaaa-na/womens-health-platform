@@ -1,3 +1,4 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
 import { healthArticles } from "../../data/healthArticles";
 
@@ -7,6 +8,51 @@ function HealthArticleDetails() {
   const article = healthArticles.find(
     (item) => item.id === Number(id)
   );
+
+  const [isSaved, setIsSaved] = useState(false);
+
+  useEffect(() => {
+    if (!article) return;
+
+    const savedArticles = JSON.parse(
+      localStorage.getItem("herbloomSavedArticles") || "[]"
+    );
+
+    setIsSaved(savedArticles.includes(article.id));
+  }, [article]);
+
+  const handleSaveArticle = () => {
+    if (!article) return;
+
+    const savedArticles = JSON.parse(
+      localStorage.getItem("herbloomSavedArticles") || "[]"
+    );
+
+    if (savedArticles.includes(article.id)) {
+      const updatedArticles = savedArticles.filter(
+        (savedId: number) => savedId !== article.id
+      );
+
+      localStorage.setItem(
+        "herbloomSavedArticles",
+        JSON.stringify(updatedArticles)
+      );
+
+      setIsSaved(false);
+    } else {
+      const updatedArticles = [
+        ...savedArticles,
+        article.id,
+      ];
+
+      localStorage.setItem(
+        "herbloomSavedArticles",
+        JSON.stringify(updatedArticles)
+      );
+
+      setIsSaved(true);
+    }
+  };
 
   if (!article) {
     return (
@@ -24,7 +70,7 @@ function HealthArticleDetails() {
 
           <Link
             to="/health-library/articles"
-            className="mt-6 inline-block rounded-lg bg-pink-600 px-5 py-3 font-semibold text-white"
+            className="mt-6 inline-block rounded-lg bg-pink-600 px-5 py-3 font-semibold text-white transition hover:bg-pink-700"
           >
             Back to Articles
           </Link>
@@ -90,9 +136,16 @@ function HealthArticleDetails() {
 
             <button
               type="button"
-              className="rounded-lg border border-pink-600 px-5 py-3 font-semibold text-pink-600 transition hover:bg-pink-50"
+              onClick={handleSaveArticle}
+              className={`rounded-lg border px-5 py-3 font-semibold transition ${
+                isSaved
+                  ? "border-pink-600 bg-pink-50 text-pink-600"
+                  : "border-pink-600 text-pink-600 hover:bg-pink-50"
+              }`}
             >
-              ❤️ Save Article
+              {isSaved
+                ? "❤️ Saved Article"
+                : "♡ Save Article"}
             </button>
 
             <a
