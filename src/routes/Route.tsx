@@ -6,8 +6,7 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import { publicRoutes } from "./routes";
 
-// ==================== PERIOD TRACKER ====================
-
+// Period
 import PeriodDashboard from "../pages/period/PeriodDashboard";
 import CycleSetup from "../pages/period/CycleSetup";
 import FlowTracker from "../pages/period/FlowTracker";
@@ -19,8 +18,7 @@ import PeriodNotes from "../pages/period/PeriodNotes";
 import ReportsInsights from "../pages/period/ReportsInsights";
 import PartnerSharing from "../pages/period/PartnerSharing";
 
-// ==================== PREGNANCY TRACKER ====================
-
+// Pregnancy
 import PregnancyDashboard from "../pages/pregnancy/PregnancyDashboard";
 import PregnancySetup from "../pages/pregnancy/PregnancySetup";
 import BabyDevelopment from "../pages/pregnancy/BabyDevelopment";
@@ -35,8 +33,7 @@ import PregnancyWellness from "../pages/pregnancy/PregnancyWellness";
 import PregnancyNotes from "../pages/pregnancy/PregnancyNotes";
 import PregnancyTimeline from "../pages/pregnancy/PregnancyTimeline";
 
-// ==================== HEALTH LIBRARY ====================
-
+// Health Library
 import HealthLibrary from "../pages/health/HealthLibrary";
 import HealthCategories from "../pages/health/HealthCategories";
 import HealthSearch from "../pages/health/HealthSearch";
@@ -44,22 +41,19 @@ import HealthArticles from "../pages/health/HealthArticles";
 import HealthArticleDetails from "../pages/health/HealthArticleDetails";
 import HealthSaved from "../pages/health/HealthSaved";
 
-// ==================== HEALTHCARE PROFESSIONALS ====================
-
+// Healthcare Professionals
 import FindProfessional from "../pages/professionals/FindProfessional";
 import ProfessionalProfile from "../pages/professionals/ProfessionalProfile";
 import ConsultationChat from "../pages/professionals/ConsultationChat";
 
-// ==================== EMERGENCY ASSISTANCE ====================
-
+// Emergency
 import EmergencyHome from "../pages/emergency/EmergencyHome";
 import EmergencyContacts from "../pages/emergency/EmergencyContacts";
 import FindHealthcareFacility from "../pages/emergency/FindHealthcareFacility";
 import EmergencyServices from "../pages/emergency/EmergencyServices";
 import EmergencyInformation from "../pages/emergency/EmergencyInformation";
 
-// ==================== COMMUNITY ====================
-
+// Community
 import CommunityHome from "../pages/community/CommunityHome";
 import CommunityPosts from "../pages/community/CommunityPosts";
 import CommunityComments from "../pages/community/CommunityComments";
@@ -67,13 +61,28 @@ import ProfessionalHealthContent from "../pages/community/ProfessionalHealthCont
 import VerifiedProof from "../pages/community/VerifiedProof";
 import UserProfile from "../pages/community/UserProfile";
 
+// Appointments
+import Appointments from "../pages/appointments/Appointments";
+import BookAppointment from "../pages/appointments/BookAppointment";
+import AppointmentDetails from "../pages/appointments/AppointmentDetails";
+import MyAppointments from "../pages/appointments/MyAppointments";
+import AppointmentHistory from "../pages/appointments/AppointmentHistory";
+import RescheduleAppointment from "../pages/appointments/RescheduleAppointment";
+import CancelAppointment from "../pages/appointments/CancelAppointment";
+
+// Notifications
+import Notifications from "../pages/notifications/Notifications";
+import CreateReminder from "../pages/notifications/CreateReminder";
+import ReminderList from "../pages/notifications/ReminderList";
+import EditReminder from "../pages/notifications/EditReminder";
+import NotificationSettings from "../pages/notifications/NotificationSettings";
+
 function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* ==================== PUBLIC ROUTES ==================== */}
-
+        {/* Public Routes */}
         <Route element={<UnauthLayout />}>
           {publicRoutes.map((route) => (
             <Route
@@ -84,12 +93,13 @@ function AppRoutes() {
           ))}
         </Route>
 
-        {/* ==================== PROTECTED ROUTES ==================== */}
-
+        {/* Protected Routes */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AuthLayout />}>
 
-            {/* ==================== PERIOD TRACKER ==================== */}
+            {/* =========================
+                PERIOD TRACKER
+            ========================= */}
 
             <Route
               path="/period-tracker"
@@ -141,8 +151,9 @@ function AppRoutes() {
               element={<PartnerSharing />}
             />
 
-
-            {/* ==================== PREGNANCY TRACKER ==================== */}
+            {/* =========================
+                PREGNANCY TRACKER
+            ========================= */}
 
             <Route
               path="/pregnancy-tracker"
@@ -209,8 +220,9 @@ function AppRoutes() {
               element={<PregnancyTimeline />}
             />
 
-
-            {/* ==================== HEALTH LIBRARY ==================== */}
+            {/* =========================
+                HEALTH LIBRARY
+            ========================= */}
 
             <Route
               path="/health-library"
@@ -242,8 +254,9 @@ function AppRoutes() {
               element={<HealthArticleDetails />}
             />
 
-
-            {/* ==================== HEALTHCARE PROFESSIONALS ==================== */}
+            {/* =========================
+                HEALTHCARE PROFESSIONALS
+            ========================= */}
 
             <Route
               path="/healthcare-professionals"
@@ -260,8 +273,9 @@ function AppRoutes() {
               element={<ConsultationChat />}
             />
 
-
-            {/* ==================== EMERGENCY ASSISTANCE ==================== */}
+            {/* =========================
+                EMERGENCY ASSISTANCE
+            ========================= */}
 
             <Route
               path="/emergency"
@@ -288,8 +302,9 @@ function AppRoutes() {
               element={<EmergencyInformation />}
             />
 
-
-            {/* ==================== COMMUNITY ==================== */}
+            {/* =========================
+                COMMUNITY
+            ========================= */}
 
             <Route
               path="/community"
@@ -319,6 +334,74 @@ function AppRoutes() {
             <Route
               path="/community/profile"
               element={<UserProfile />}
+            />
+
+            {/* =========================
+                APPOINTMENTS
+            ========================= */}
+
+            <Route
+              path="/appointments"
+              element={<Appointments />}
+            />
+
+            <Route
+              path="/appointments/book"
+              element={<BookAppointment />}
+            />
+
+            <Route
+              path="/appointments/:id"
+              element={<AppointmentDetails />}
+            />
+
+            <Route
+              path="/appointments/my-appointments"
+              element={<MyAppointments />}
+            />
+
+            <Route
+              path="/appointments/history"
+              element={<AppointmentHistory />}
+            />
+
+            <Route
+              path="/appointments/:id/reschedule"
+              element={<RescheduleAppointment />}
+            />
+
+            <Route
+              path="/appointments/:id/cancel"
+              element={<CancelAppointment />}
+            />
+
+            {/* =========================
+                NOTIFICATIONS & REMINDERS
+            ========================= */}
+
+            <Route
+              path="/notifications"
+              element={<Notifications />}
+            />
+
+            <Route
+              path="/notifications/create"
+              element={<CreateReminder />}
+            />
+
+            <Route
+              path="/notifications/reminders"
+              element={<ReminderList />}
+            />
+
+            <Route
+              path="/notifications/reminders/:id/edit"
+              element={<EditReminder />}
+            />
+
+            <Route
+              path="/notifications/settings"
+              element={<NotificationSettings />}
             />
 
           </Route>
