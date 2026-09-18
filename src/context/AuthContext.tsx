@@ -36,7 +36,9 @@ interface AuthContextType {
     firstName: string,
     lastName: string,
     email: string,
-    password: string
+    password: string,
+    acceptTerms?: boolean,
+    healthDataConsent?: boolean
   ) => Promise<boolean>;
 
   logout: () => void;
@@ -139,14 +141,18 @@ export function AuthProvider({
       firstName: string,
       lastName: string,
       email: string,
-      password: string
+      password: string,
+      acceptTerms?: boolean,
+      healthDataConsent?: boolean
     ): Promise<boolean> => {
       const response = await request(() =>
         signUpUser(
           firstName,
           lastName,
           email,
-          password
+          password,
+          acceptTerms,
+          healthDataConsent
         )
       );
 

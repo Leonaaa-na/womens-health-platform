@@ -94,7 +94,10 @@ export const signUpUser = async (
   firstName: string,
   lastName: string,
   email: string,
-  password: string
+  password: string,
+  acceptTerms?: boolean,
+  healthDataConsent?: boolean
+
 ): Promise<AuthResponse> => {
   await delay(1000);
 
@@ -119,7 +122,7 @@ export const signUpUser = async (
       bio: "HerBloom community member",
     },
   };
-
+const response: AuthResponse = {
   // Save the newly created account
   // so it can be used during login.
   localStorage.setItem(
