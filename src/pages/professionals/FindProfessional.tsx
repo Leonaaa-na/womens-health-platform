@@ -48,6 +48,74 @@ const professionals: Professional[] = [
     availability: "Available this week",
     verified: true,
   },
+  {
+    id: 5,
+    name: "Dr. Adwoa Owusu",
+    specialty: "Psychologist",
+    location: "Accra, Ghana",
+    experience: "7 years experience",
+    availability: "Available for consultation",
+    verified: true,
+  },
+  {
+    id: 6,
+    name: "Dr. Yaa Asante",
+    specialty: "Nutritionist / Dietitian",
+    location: "Kumasi, Ghana",
+    experience: "6 years experience",
+    availability: "Available this week",
+    verified: true,
+  },
+  {
+    id: 7,
+    name: "Dr. Mabel Addo",
+    specialty: "Reproductive Health Specialist",
+    location: "Accra, Ghana",
+    experience: "9 years experience",
+    availability: "Available for consultation",
+    verified: true,
+  },
+  {
+    id: 8,
+    name: "Dr. Kofi Mensah",
+    specialty: "General Practitioner",
+    location: "Tema, Ghana",
+    experience: "8 years experience",
+    availability: "Available this week",
+    verified: true,
+  },
+  {
+    id: 9,
+    name: "Dr. Linda Boateng",
+    specialty: "Paediatrician",
+    location: "Accra, Ghana",
+    experience: "11 years experience",
+    availability: "Available for consultation",
+    verified: true,
+  },
+  {
+    id: 10,
+    name: "Dr. Akua Frimpong",
+    specialty: "Maternal & Child Health Specialist",
+    location: "Cape Coast, Ghana",
+    experience: "8 years experience",
+    availability: "Available this week",
+    verified: true,
+  },
+];
+
+const specialties = [
+  "All",
+  "Obstetrician & Gynaecologist",
+  "Women's Health Specialist",
+  "Fertility Specialist",
+  "Midwife",
+  "Psychologist",
+  "Nutritionist / Dietitian",
+  "Reproductive Health Specialist",
+  "General Practitioner",
+  "Paediatrician",
+  "Maternal & Child Health Specialist",
 ];
 
 function FindProfessional() {
@@ -94,7 +162,6 @@ function FindProfessional() {
 
         {/* Search and Filter */}
         <div className="mb-10 rounded-2xl bg-white p-6 shadow-sm">
-
           <div className="grid gap-4 md:grid-cols-3">
 
             {/* Search */}
@@ -135,19 +202,13 @@ function FindProfessional() {
                 }
                 className="w-full rounded-lg border border-gray-300 bg-white px-4 py-3 outline-none transition focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
               >
-                <option value="All">All Specialties</option>
-                <option value="Obstetrician & Gynaecologist">
-                  Obstetrician & Gynaecologist
-                </option>
-                <option value="Women's Health Specialist">
-                  Women's Health Specialist
-                </option>
-                <option value="Fertility Specialist">
-                  Fertility Specialist
-                </option>
-                <option value="Midwife">
-                  Midwife
-                </option>
+                {specialties.map((item) => (
+                  <option key={item} value={item}>
+                    {item === "All"
+                      ? "All Specialties"
+                      : item}
+                  </option>
+                ))}
               </select>
             </div>
 
@@ -155,20 +216,18 @@ function FindProfessional() {
         </div>
 
         {/* Results Header */}
-        <div className="mb-6 flex items-center justify-between">
-          <div>
-            <h2 className="text-2xl font-bold text-gray-900">
-              Healthcare Professionals
-            </h2>
+        <div className="mb-6">
+          <h2 className="text-2xl font-bold text-gray-900">
+            Healthcare Professionals
+          </h2>
 
-            <p className="mt-1 text-sm text-gray-500">
-              {filteredProfessionals.length}{" "}
-              {filteredProfessionals.length === 1
-                ? "professional"
-                : "professionals"}{" "}
-              found
-            </p>
-          </div>
+          <p className="mt-1 text-sm text-gray-500">
+            {filteredProfessionals.length}{" "}
+            {filteredProfessionals.length === 1
+              ? "professional"
+              : "professionals"}{" "}
+            found
+          </p>
         </div>
 
         {/* Professionals */}
@@ -185,7 +244,17 @@ function FindProfessional() {
                 <div className="flex items-start gap-4">
 
                   <div className="flex h-16 w-16 shrink-0 items-center justify-center rounded-full bg-pink-50 text-3xl">
-                    👩🏾‍⚕️
+                    {professional.specialty === "Psychologist"
+                      ? "🧠"
+                      : professional.specialty ===
+                        "Nutritionist / Dietitian"
+                      ? "🥗"
+                      : professional.specialty ===
+                        "Paediatrician"
+                      ? "👶"
+                      : professional.specialty === "Midwife"
+                      ? "🤱🏾"
+                      : "👩🏾‍⚕️"}
                   </div>
 
                   <div className="min-w-0 flex-1">
@@ -252,8 +321,6 @@ function FindProfessional() {
 
           </div>
         ) : (
-
-          /* No Results */
           <div className="rounded-2xl bg-white p-10 text-center shadow-sm">
 
             <div className="text-5xl">
@@ -272,8 +339,52 @@ function FindProfessional() {
           </div>
         )}
 
+        {/* DoctorEVS External Finder */}
+        <div className="mt-10 rounded-2xl border border-teal-100 bg-gradient-to-r from-teal-50 to-cyan-50 p-6 shadow-sm">
+
+          <div className="flex flex-col gap-5 md:flex-row md:items-center md:justify-between">
+
+            <div className="flex items-start gap-4">
+
+              <div className="flex h-14 w-14 shrink-0 items-center justify-center rounded-full bg-white text-2xl shadow-sm">
+                🔎
+              </div>
+
+              <div>
+                <h2 className="text-xl font-bold text-gray-900">
+                  Can't Find the Professional You Need?
+                </h2>
+
+                <p className="mt-2 max-w-2xl text-sm leading-6 text-gray-600">
+                  You can search for additional healthcare
+                  professionals through DoctorEVS, an external
+                  healthcare service.
+                </p>
+              </div>
+
+            </div>
+
+            <a
+              href="https://doctorevs.com"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="shrink-0 rounded-xl bg-teal-500 px-6 py-3 text-center text-sm font-semibold text-white transition hover:bg-teal-600"
+            >
+              Find More Professionals ↗
+            </a>
+
+          </div>
+
+          <p className="mt-4 text-xs text-gray-500">
+            You will be redirected to an external website.
+            HerBloom does not manage or verify professionals
+            listed on external services.
+          </p>
+
+        </div>
+
         {/* Information Notice */}
-        <div className="mt-10 rounded-2xl border border-pink-100 bg-pink-50 p-6">
+        <div className="mt-6 rounded-2xl border border-pink-100 bg-pink-50 p-6">
 
           <h2 className="font-bold text-gray-900">
             About Healthcare Professionals

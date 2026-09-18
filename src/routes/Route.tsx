@@ -1,4 +1,4 @@
-import { Routes, Route, BrowserRouter } from "react-router-dom";
+import { BrowserRouter, Route, Routes } from "react-router-dom";
 
 import UnauthLayout from "../layouts/UnauthLayout";
 import AuthLayout from "../layouts/AuthLayout";
@@ -6,7 +6,14 @@ import ProtectedRoute from "./ProtectedRoute";
 
 import { publicRoutes } from "./routes";
 
-// Period
+// Profile
+import Profile from "../pages/profile/Profile";
+import EditProfile from "../pages/profile/EditProfile";
+import AccountSecurity from "../pages/profile/AccountSecurity";
+import AppSettings from "../pages/profile/AppSettings";
+import PrivacyTerms from "../pages/profile/PrivacyTerms";
+
+// Period Tracker
 import PeriodDashboard from "../pages/period/PeriodDashboard";
 import CycleSetup from "../pages/period/CycleSetup";
 import FlowTracker from "../pages/period/FlowTracker";
@@ -18,7 +25,7 @@ import PeriodNotes from "../pages/period/PeriodNotes";
 import ReportsInsights from "../pages/period/ReportsInsights";
 import PartnerSharing from "../pages/period/PartnerSharing";
 
-// Pregnancy
+// Pregnancy Tracker
 import PregnancyDashboard from "../pages/pregnancy/PregnancyDashboard";
 import PregnancySetup from "../pages/pregnancy/PregnancySetup";
 import BabyDevelopment from "../pages/pregnancy/BabyDevelopment";
@@ -46,7 +53,7 @@ import FindProfessional from "../pages/professionals/FindProfessional";
 import ProfessionalProfile from "../pages/professionals/ProfessionalProfile";
 import ConsultationChat from "../pages/professionals/ConsultationChat";
 
-// Emergency
+// Emergency Assistance
 import EmergencyHome from "../pages/emergency/EmergencyHome";
 import EmergencyContacts from "../pages/emergency/EmergencyContacts";
 import FindHealthcareFacility from "../pages/emergency/FindHealthcareFacility";
@@ -70,19 +77,29 @@ import AppointmentHistory from "../pages/appointments/AppointmentHistory";
 import RescheduleAppointment from "../pages/appointments/RescheduleAppointment";
 import CancelAppointment from "../pages/appointments/CancelAppointment";
 
-// Notifications
+// Notifications & Reminders
 import Notifications from "../pages/notifications/Notifications";
 import CreateReminder from "../pages/notifications/CreateReminder";
 import ReminderList from "../pages/notifications/ReminderList";
 import EditReminder from "../pages/notifications/EditReminder";
 import NotificationSettings from "../pages/notifications/NotificationSettings";
 
+// Premium
+import Premium from "../pages/premium/Premium";
+import PremiumPlans from "../pages/premium/PremiumPlans";
+import PremiumCheckout from "../pages/premium/PremiumCheckout";
+import PremiumFeatures from "../pages/premium/PremiumFeatures";
+import PremiumStatus from "../pages/premium/PremiumStatus";
+import PaymentCallback from "../pages/premium/PaymentCallback";
+
 function AppRoutes() {
   return (
     <BrowserRouter>
       <Routes>
 
-        {/* Public Routes */}
+        {/* =========================
+            PUBLIC ROUTES
+        ========================= */}
         <Route element={<UnauthLayout />}>
           {publicRoutes.map((route) => (
             <Route
@@ -93,9 +110,40 @@ function AppRoutes() {
           ))}
         </Route>
 
-        {/* Protected Routes */}
+        {/* =========================
+            PROTECTED ROUTES
+        ========================= */}
         <Route element={<ProtectedRoute />}>
           <Route element={<AuthLayout />}>
+
+            {/* =========================
+                PROFILE
+            ========================= */}
+
+            <Route
+              path="/profile"
+              element={<Profile />}
+            />
+
+            <Route
+              path="/profile/edit"
+              element={<EditProfile />}
+            />
+
+            <Route
+              path="/profile/security"
+              element={<AccountSecurity />}
+            />
+
+            <Route
+              path="/profile/settings"
+              element={<AppSettings />}
+            />
+
+            <Route
+              path="/profile/privacy"
+              element={<PrivacyTerms />}
+            />
 
             {/* =========================
                 PERIOD TRACKER
@@ -240,11 +288,6 @@ function AppRoutes() {
             />
 
             <Route
-              path="/health-library/saved"
-              element={<HealthSaved />}
-            />
-
-            <Route
               path="/health-library/articles"
               element={<HealthArticles />}
             />
@@ -252,6 +295,11 @@ function AppRoutes() {
             <Route
               path="/health-library/articles/:id"
               element={<HealthArticleDetails />}
+            />
+
+            <Route
+              path="/health-library/saved"
+              element={<HealthSaved />}
             />
 
             {/* =========================
@@ -402,6 +450,44 @@ function AppRoutes() {
             <Route
               path="/notifications/settings"
               element={<NotificationSettings />}
+            />
+
+            {/* =========================
+                PREMIUM
+            ========================= */}
+
+            <Route
+              path="/premium"
+              element={<Premium />}
+            />
+
+            <Route
+              path="/premium/plans"
+              element={<PremiumPlans />}
+            />
+
+            <Route
+              path="/premium/checkout"
+              element={<PremiumCheckout />}
+            />
+
+            <Route
+              path="/premium/features"
+              element={<PremiumFeatures />}
+            />
+
+            <Route
+              path="/premium/status"
+              element={<PremiumStatus />}
+            />
+
+            {/* =========================
+                PAYMENT CALLBACK
+            ========================= */}
+
+            <Route
+              path="/payment/callback"
+              element={<PaymentCallback />}
             />
 
           </Route>

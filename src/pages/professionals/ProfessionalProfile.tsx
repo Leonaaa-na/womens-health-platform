@@ -98,6 +98,132 @@ const professionals: Professional[] = [
       "Birth Preparation",
     ],
   },
+  {
+    id: 5,
+    name: "Dr. Adwoa Owusu",
+    specialty: "Psychologist",
+    location: "Accra, Ghana",
+    experience: "7 years experience",
+    availability: "Available for consultation",
+    verified: true,
+    qualifications: [
+      "Psychology Degree",
+      "Professional Psychology Certification",
+      "Mental Wellbeing Specialist",
+    ],
+    about:
+      "Dr. Adwoa Owusu provides professional psychological support and wellbeing-focused guidance for women.",
+    consultationTypes: [
+      "Mental Wellbeing",
+      "Stress Management",
+      "Emotional Support",
+    ],
+  },
+  {
+    id: 6,
+    name: "Dr. Yaa Asante",
+    specialty: "Nutritionist / Dietitian",
+    location: "Kumasi, Ghana",
+    experience: "6 years experience",
+    availability: "Available this week",
+    verified: true,
+    qualifications: [
+      "Nutrition and Dietetics Certification",
+      "Registered Dietitian",
+      "Women's Nutrition Specialist",
+    ],
+    about:
+      "Dr. Yaa Asante provides nutrition and dietary guidance supporting women's health and wellbeing.",
+    consultationTypes: [
+      "Women's Nutrition",
+      "Healthy Eating",
+      "Pregnancy Nutrition",
+    ],
+  },
+  {
+    id: 7,
+    name: "Dr. Mabel Addo",
+    specialty: "Reproductive Health Specialist",
+    location: "Accra, Ghana",
+    experience: "9 years experience",
+    availability: "Available for consultation",
+    verified: true,
+    qualifications: [
+      "MBChB",
+      "Reproductive Health Certification",
+      "Women's Health Specialist",
+    ],
+    about:
+      "Dr. Mabel Addo focuses on reproductive health education, women's health and reproductive wellbeing.",
+    consultationTypes: [
+      "Reproductive Health",
+      "Menstrual Health",
+      "Sexual Health Education",
+    ],
+  },
+  {
+    id: 8,
+    name: "Dr. Kofi Mensah",
+    specialty: "General Practitioner",
+    location: "Tema, Ghana",
+    experience: "8 years experience",
+    availability: "Available this week",
+    verified: true,
+    qualifications: [
+      "MBChB",
+      "General Medical Practice Certification",
+      "Primary Care Experience",
+    ],
+    about:
+      "Dr. Kofi Mensah provides general medical care and can help users understand common health concerns and appropriate next steps.",
+    consultationTypes: [
+      "General Health",
+      "Primary Care",
+      "Health Guidance",
+    ],
+  },
+  {
+    id: 9,
+    name: "Dr. Linda Boateng",
+    specialty: "Paediatrician",
+    location: "Accra, Ghana",
+    experience: "11 years experience",
+    availability: "Available for consultation",
+    verified: true,
+    qualifications: [
+      "MBChB",
+      "Paediatrics Certification",
+      "Child Health Specialist",
+    ],
+    about:
+      "Dr. Linda Boateng provides professional guidance relating to children's health and development.",
+    consultationTypes: [
+      "Child Health",
+      "Child Development",
+      "Maternal & Child Health",
+    ],
+  },
+  {
+    id: 10,
+    name: "Dr. Akua Frimpong",
+    specialty: "Maternal & Child Health Specialist",
+    location: "Cape Coast, Ghana",
+    experience: "8 years experience",
+    availability: "Available this week",
+    verified: true,
+    qualifications: [
+      "MBChB",
+      "Maternal & Child Health Certification",
+      "Family Health Specialist",
+    ],
+    about:
+      "Dr. Akua Frimpong focuses on maternal and child health, providing education and professional guidance across the pregnancy and family health journey.",
+    consultationTypes: [
+      "Maternal Health",
+      "Child Health",
+      "Family Health",
+    ],
+  },
 ];
 
 function ProfessionalProfile() {
@@ -137,6 +263,17 @@ function ProfessionalProfile() {
     );
   }
 
+  const profileIcon =
+    professional.specialty === "Psychologist"
+      ? "🧠"
+      : professional.specialty === "Nutritionist / Dietitian"
+      ? "🥗"
+      : professional.specialty === "Paediatrician"
+      ? "👶"
+      : professional.specialty === "Midwife"
+      ? "🤱🏾"
+      : "👩🏾‍⚕️";
+
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="mx-auto max-w-5xl">
@@ -156,7 +293,7 @@ function ProfessionalProfile() {
 
             {/* Profile Image */}
             <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-pink-50 text-6xl">
-              👩🏾‍⚕️
+              {profileIcon}
             </div>
 
             {/* Main Details */}
@@ -210,12 +347,12 @@ function ProfessionalProfile() {
               💬 Start Consultation Chat
             </Link>
 
-            <button
-              type="button"
-              className="flex-1 rounded-lg border border-pink-600 px-5 py-3 font-semibold text-pink-600 transition hover:bg-pink-50"
+            <Link
+              to="/appointments/book"
+              className="flex-1 rounded-lg border border-pink-600 px-5 py-3 text-center font-semibold text-pink-600 transition hover:bg-pink-50"
             >
               📅 Book an Appointment
-            </button>
+            </Link>
 
           </div>
 

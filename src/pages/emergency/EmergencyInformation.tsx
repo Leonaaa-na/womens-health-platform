@@ -1,5 +1,5 @@
 import { useState } from "react";
-import { Link } from "react-router-dom";
+import { useNavigate } from "react-router-dom";
 
 interface EmergencyGuide {
   title: string;
@@ -13,33 +13,36 @@ const emergencyGuides: EmergencyGuide[] = [
     title: "Severe Bleeding",
     icon: "🩸",
     description:
-      "Heavy or uncontrolled bleeding may require immediate emergency assistance.",
+      "Heavy or uncontrolled bleeding can require immediate medical attention.",
     guidance: [
-      "Call emergency services if the bleeding is severe or does not stop.",
-      "Apply firm pressure to the bleeding area with a clean cloth or dressing.",
-      "Do not delay seeking professional medical assistance.",
+      "Seek emergency medical help immediately.",
+      "Keep the person as calm and still as possible.",
+      "Apply gentle pressure to the affected area if appropriate.",
+      "Do not delay seeking professional medical care.",
     ],
   },
   {
-    title: "Severe Abdominal or Pelvic Pain",
-    icon: "🩺",
+    title: "Severe Abdominal/Pelvic Pain",
+    icon: "⚠️",
     description:
-      "Sudden or severe abdominal or pelvic pain can require urgent medical assessment.",
+      "Sudden or severe abdominal or pelvic pain may require urgent assessment.",
     guidance: [
       "Seek urgent medical attention if the pain is severe, sudden, or worsening.",
-      "Contact emergency services if the person appears seriously unwell.",
-      "Do not rely on the app to determine the cause of severe pain.",
+      "Pay attention to other symptoms such as fainting, fever, vomiting, or unusual bleeding.",
+      "Avoid delaying care if the symptoms feel serious or unusual for you.",
+      "Contact an emergency service or healthcare facility when necessary.",
     ],
   },
   {
     title: "Pregnancy Emergency",
-    icon: "🤰🏾",
+    icon: "🤰",
     description:
-      "Certain symptoms during pregnancy require prompt professional assessment.",
+      "Certain symptoms during pregnancy require prompt medical attention.",
     guidance: [
-      "Seek urgent medical care for severe pain, heavy bleeding, or other serious symptoms.",
-      "Contact your healthcare professional or an emergency service when necessary.",
-      "If the situation appears life-threatening, call emergency services immediately.",
+      "Seek urgent medical care for concerning or severe symptoms during pregnancy.",
+      "Contact your healthcare professional or emergency service.",
+      "Keep important pregnancy and medical information available.",
+      "Do not delay professional assessment when symptoms are severe or worsening.",
     ],
   },
   {
@@ -48,182 +51,274 @@ const emergencyGuides: EmergencyGuide[] = [
     description:
       "Serious difficulty breathing can be an emergency.",
     guidance: [
-      "Call emergency services immediately if breathing difficulty is severe.",
-      "Keep the person in a position that helps them breathe comfortably.",
-      "Do not leave someone experiencing a serious breathing emergency alone.",
+      "Seek emergency medical assistance immediately.",
+      "Keep the person calm and in a comfortable position.",
+      "Do not leave someone experiencing severe breathing difficulty alone.",
+      "Contact an emergency service if the breathing problem is severe.",
     ],
   },
   {
-    title: "Fainting or Loss of Consciousness",
-    icon: "⚠️",
+    title: "Fainting/Loss of Consciousness",
+    icon: "🚨",
     description:
-      "Fainting or being unresponsive can require urgent medical attention.",
+      "Loss of consciousness or repeated fainting should be taken seriously.",
     guidance: [
-      "Check that the person is responsive and breathing normally.",
-      "Call emergency services if they are unresponsive or seriously unwell.",
-      "Seek professional medical assessment, especially if the episode is unexplained.",
+      "Seek medical assistance, especially if the person does not quickly recover.",
+      "Keep the person safe from further injury.",
+      "Do not give food or drink to someone who is unconscious.",
+      "Contact emergency services when necessary.",
     ],
   },
   {
     title: "Personal Safety Emergency",
     icon: "🛡️",
     description:
-      "Immediate threats to personal safety may require emergency assistance.",
+      "If you are in immediate danger, seek help from emergency services or a trusted person.",
     guidance: [
-      "Move to a safer location if you can do so safely.",
-      "Contact an appropriate emergency service when immediate help is needed.",
-      "Contact a trusted person who can support you if appropriate.",
+      "Move to a safe location if you can do so safely.",
+      "Contact an appropriate emergency service.",
+      "Reach out to a trusted person for support.",
+      "Avoid putting yourself at additional risk while trying to get help.",
     ],
   },
 ];
 
-export default function EmergencyInformation() {
-  const [openGuide, setOpenGuide] = useState<string | null>(null);
+function EmergencyInformation() {
+  const navigate = useNavigate();
+  const [openCard, setOpenCard] = useState<number | null>(null);
+  const [medicalCardOpen, setMedicalCardOpen] = useState(false);
 
-  const toggleGuide = (title: string) => {
-    setOpenGuide((current) => (current === title ? null : title));
+  const toggleCard = (index: number) => {
+    setOpenCard(openCard === index ? null : index);
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-red-50 via-white to-pink-50 p-6">
-      <div className="mx-auto max-w-6xl">
-
+    <div className="min-h-screen bg-gradient-to-br from-red-50 via-pink-50 to-purple-50 px-4 py-8 sm:px-6 lg:px-8">
+      <div className="mx-auto max-w-5xl">
         {/* Header */}
         <div className="mb-8">
-          <div className="mb-4 flex items-center gap-3">
-            <div className="flex h-12 w-12 items-center justify-center rounded-2xl bg-red-100 text-2xl">
-              📚
-            </div>
+          <button
+            onClick={() => navigate("/emergency")}
+            className="mb-5 text-sm font-semibold text-red-600 hover:text-red-700"
+          >
+            ← Back to Emergency Assistance
+          </button>
 
-            <div>
-              <h1 className="text-3xl font-bold text-gray-900">
-                Emergency Information
-              </h1>
+          <div className="rounded-3xl bg-white p-6 shadow-lg sm:p-8">
+            <div className="flex flex-col gap-4 sm:flex-row sm:items-center">
+              <div className="flex h-16 w-16 items-center justify-center rounded-2xl bg-red-100 text-3xl">
+                📚
+              </div>
 
-              <p className="text-sm text-gray-600">
-                Important health and safety guidance for emergency situations.
-              </p>
+              <div>
+                <h1 className="text-3xl font-bold text-gray-900">
+                  Emergency Information
+                </h1>
+
+                <p className="mt-2 text-gray-600">
+                  General guidance for situations that may require urgent
+                  medical or personal safety assistance.
+                </p>
+              </div>
             </div>
           </div>
+        </div>
 
-          {/* Emergency Notice */}
-          <div className="rounded-2xl border border-red-200 bg-red-50 p-5">
-            <h2 className="font-bold text-red-700">
-              🚨 Important
-            </h2>
-
-            <p className="mt-2 text-sm leading-6 text-gray-700">
-              This information is for general guidance only. It does not
-              replace emergency services, a doctor, nurse, midwife, or
-              other qualified healthcare professional.
-            </p>
-
-            <Link
-              to="/emergency/services"
-              className="mt-4 inline-block rounded-xl bg-red-600 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-700"
+        {/* Emergency Guidance Cards */}
+        <div className="space-y-4">
+          {emergencyGuides.map((guide, index) => (
+            <div
+              key={guide.title}
+              className="overflow-hidden rounded-2xl bg-white shadow-md"
             >
-              📞 View Emergency Services
-            </Link>
-          </div>
-        </div>
+              <button
+                onClick={() => toggleCard(index)}
+                className="flex w-full items-center justify-between gap-4 p-5 text-left transition hover:bg-red-50"
+              >
+                <div className="flex items-center gap-4">
+                  <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-red-100 text-2xl">
+                    {guide.icon}
+                  </div>
 
-        {/* Emergency Guides */}
-        <div>
-          <h2 className="mb-2 text-xl font-bold text-gray-900">
-            📖 Emergency Health Guidance
-          </h2>
+                  <div>
+                    <h2 className="text-lg font-bold text-gray-900">
+                      {guide.title}
+                    </h2>
 
-          <p className="mb-5 text-sm text-gray-600">
-            Select a topic to view general guidance.
-          </p>
-
-          <div className="space-y-4">
-            {emergencyGuides.map((guide) => {
-              const isOpen = openGuide === guide.title;
-
-              return (
-                <div
-                  key={guide.title}
-                  className="overflow-hidden rounded-2xl border border-gray-200 bg-white shadow-sm"
-                >
-                  {/* Guide Header */}
-                  <button
-                    type="button"
-                    onClick={() => toggleGuide(guide.title)}
-                    className="flex w-full items-center justify-between p-5 text-left transition hover:bg-gray-50"
-                  >
-                    <div className="flex items-center gap-4">
-                      <div className="flex h-12 w-12 items-center justify-center rounded-xl bg-pink-100 text-2xl">
-                        {guide.icon}
-                      </div>
-
-                      <div>
-                        <h3 className="font-bold text-gray-900">
-                          {guide.title}
-                        </h3>
-
-                        <p className="mt-1 text-sm text-gray-500">
-                          {guide.description}
-                        </p>
-                      </div>
-                    </div>
-
-                    <span className="ml-4 text-xl text-gray-500">
-                      {isOpen ? "−" : "+"}
-                    </span>
-                  </button>
-
-                  {/* Guide Content */}
-                  {isOpen && (
-                    <div className="border-t border-gray-100 bg-gray-50 p-5">
-                      <h4 className="mb-3 text-sm font-bold text-gray-800">
-                        General guidance
-                      </h4>
-
-                      <ul className="space-y-3">
-                        {guide.guidance.map((item, index) => (
-                          <li
-                            key={index}
-                            className="flex items-start gap-3 text-sm leading-6 text-gray-700"
-                          >
-                            <span className="mt-1 font-bold text-pink-600">
-                              •
-                            </span>
-
-                            <span>{item}</span>
-                          </li>
-                        ))}
-                      </ul>
-
-                      <Link
-                        to="/emergency/services"
-                        className="mt-5 inline-block rounded-xl bg-pink-600 px-4 py-3 text-sm font-semibold text-white transition hover:bg-pink-700"
-                      >
-                        📞 Get Emergency Help
-                      </Link>
-                    </div>
-                  )}
+                    <p className="mt-1 text-sm text-gray-600">
+                      {guide.description}
+                    </p>
+                  </div>
                 </div>
-              );
-            })}
+
+                <span className="text-xl text-gray-500">
+                  {openCard === index ? "▲" : "▼"}
+                </span>
+              </button>
+
+              {openCard === index && (
+                <div className="border-t border-red-100 bg-red-50/50 px-5 pb-5 pt-4">
+                  <h3 className="mb-3 font-semibold text-gray-900">
+                    What to do
+                  </h3>
+
+                  <ul className="space-y-3">
+                    {guide.guidance.map((item) => (
+                      <li
+                        key={item}
+                        className="flex gap-3 text-sm leading-6 text-gray-700"
+                      >
+                        <span className="mt-1 text-red-500">•</span>
+                        <span>{item}</span>
+                      </li>
+                    ))}
+                  </ul>
+
+                  <button
+                    onClick={() => navigate("/emergency/services")}
+                    className="mt-5 rounded-xl bg-red-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-red-600"
+                  >
+                    View Emergency Services
+                  </button>
+                </div>
+              )}
+            </div>
+          ))}
+
+          {/* PERSONAL MEDICAL CARD — NEW ADDITION */}
+          <div className="overflow-hidden rounded-2xl bg-white shadow-md">
+            <button
+              onClick={() => setMedicalCardOpen(!medicalCardOpen)}
+              className="flex w-full items-center justify-between gap-4 p-5 text-left transition hover:bg-purple-50"
+            >
+              <div className="flex items-center gap-4">
+                <div className="flex h-12 w-12 shrink-0 items-center justify-center rounded-xl bg-purple-100 text-2xl">
+                  🪪
+                </div>
+
+                <div>
+                  <h2 className="text-lg font-bold text-gray-900">
+                    Personal Medical Card
+                  </h2>
+
+                  <p className="mt-1 text-sm text-gray-600">
+                    Keep important personal medical information available
+                    during an emergency.
+                  </p>
+                </div>
+              </div>
+
+              <span className="text-xl text-gray-500">
+                {medicalCardOpen ? "▲" : "▼"}
+              </span>
+            </button>
+
+            {medicalCardOpen && (
+              <div className="border-t border-purple-100 bg-purple-50/50 p-5">
+                <div className="mb-5 rounded-xl bg-white p-4">
+                  <p className="text-sm leading-6 text-gray-600">
+                    Your Personal Medical Card can contain important
+                    information that may help healthcare professionals or
+                    trusted people understand your needs during an emergency.
+                  </p>
+                </div>
+
+                <div className="grid gap-4 sm:grid-cols-2">
+                  <div className="rounded-xl border border-purple-100 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-purple-500">
+                      Full Name
+                    </p>
+                    <p className="mt-1 text-sm text-gray-700">
+                      Add your name
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-purple-100 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-purple-500">
+                      Blood Group
+                    </p>
+                    <p className="mt-1 text-sm text-gray-700">
+                      Add blood group
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-purple-100 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-purple-500">
+                      Allergies
+                    </p>
+                    <p className="mt-1 text-sm text-gray-700">
+                      Add allergies
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-purple-100 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-purple-500">
+                      Current Medications
+                    </p>
+                    <p className="mt-1 text-sm text-gray-700">
+                      Add medications
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-purple-100 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-purple-500">
+                      Medical Conditions
+                    </p>
+                    <p className="mt-1 text-sm text-gray-700">
+                      Add medical conditions
+                    </p>
+                  </div>
+
+                  <div className="rounded-xl border border-purple-100 bg-white p-4">
+                    <p className="text-xs font-semibold uppercase tracking-wide text-purple-500">
+                      Emergency Contact
+                    </p>
+                    <p className="mt-1 text-sm text-gray-700">
+                      Add emergency contact
+                    </p>
+                  </div>
+                </div>
+
+                <button
+                  onClick={() => navigate("/profile")}
+                  className="mt-5 rounded-xl bg-purple-500 px-5 py-3 text-sm font-semibold text-white transition hover:bg-purple-600"
+                >
+                  Manage Medical Information
+                </button>
+              </div>
+            )}
           </div>
         </div>
 
-        {/* Final Safety Notice */}
-        <div className="mt-8 rounded-2xl border border-purple-200 bg-purple-50 p-5">
-          <h3 className="font-bold text-gray-900">
-            💜 Remember
-          </h3>
+        {/* Emergency Services */}
+        <div className="mt-8 rounded-2xl bg-red-600 p-6 text-white shadow-lg">
+          <h2 className="text-xl font-bold">Need Immediate Help?</h2>
 
-          <p className="mt-2 text-sm leading-6 text-gray-600">
-            When an emergency is serious or life-threatening, getting
-            professional help quickly is more important than using an
-            app. Use HerBloom to access emergency contacts and
-            information, but always seek appropriate emergency care.
+          <p className="mt-2 text-sm leading-6 text-red-100">
+            If you believe you are experiencing an emergency, contact an
+            appropriate emergency service or seek immediate medical care.
           </p>
+
+          <button
+            onClick={() => navigate("/emergency/services")}
+            className="mt-5 rounded-xl bg-white px-5 py-3 text-sm font-bold text-red-600 transition hover:bg-red-50"
+          >
+            Emergency Services
+          </button>
         </div>
 
+        {/* Disclaimer */}
+        <div className="mt-6 rounded-2xl border border-yellow-200 bg-yellow-50 p-5">
+          <p className="text-sm leading-6 text-yellow-800">
+            <strong>Important:</strong> This information is for general
+            guidance only and does not replace professional medical advice,
+            diagnosis, or emergency care. If you are experiencing a serious
+            emergency, seek immediate professional help.
+          </p>
+        </div>
       </div>
     </div>
   );
 }
+
+export default EmergencyInformation;

@@ -34,7 +34,7 @@ function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-2 px-4 py-6">
+      <nav className="flex-1 space-y-2 overflow-y-auto px-4 py-6">
 
         {/* Period Tracker */}
         <Link
@@ -105,13 +105,52 @@ function Sidebar() {
         <Link
           to="/appointments"
           className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
-            isActive("/appointments")
+            location.pathname.startsWith("/appointments")
               ? "bg-pink-500 text-white shadow-md"
               : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
           }`}
         >
           <span className="text-lg">📅</span>
           <span>Appointments</span>
+        </Link>
+
+        {/* Notifications / Reminders */}
+        <Link
+          to="/notifications"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            location.pathname.startsWith("/notifications")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
+        >
+          <span className="text-lg">🔔</span>
+          <span>Reminders & Notifications</span>
+        </Link>
+
+        {/* Premium */}
+        <Link
+          to="/premium"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            location.pathname.startsWith("/premium")
+              ? "bg-gradient-to-r from-pink-500 to-purple-600 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
+        >
+          <span className="text-lg">💎</span>
+          <span>Premium</span>
+        </Link>
+
+        {/* Community */}
+        <Link
+          to="/community"
+          className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+            location.pathname.startsWith("/community")
+              ? "bg-pink-500 text-white shadow-md"
+              : "text-gray-700 hover:bg-white/70 hover:text-pink-700"
+          }`}
+        >
+          <span className="text-lg">👥</span>
+          <span>Community</span>
         </Link>
 
         {/* Profile */}
