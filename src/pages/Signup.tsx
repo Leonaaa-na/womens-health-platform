@@ -1,5 +1,6 @@
-import { useState } from "react";
+import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+
 import FormInput from "../components/FormInput";
 import { useAuth } from "../context/AuthContext";
 
@@ -19,22 +20,26 @@ function Signup() {
   const [password, setPassword] = useState("");
   const [confirmPassword, setConfirmPassword] =
     useState("");
+
   const [termsAccepted, setTermsAccepted] =
+    useState(false);
+
+  const [healthDataConsent, setHealthDataConsent] =
     useState(false);
 
   const [formError, setFormError] = useState("");
 
   const handleSignup = async (
-    event: React.FormEvent
+    event: FormEvent<HTMLFormElement>
   ) => {
     event.preventDefault();
 
     setFormError("");
 
     if (
-      !firstName ||
-      !lastName ||
-      !email ||
+      !firstName.trim() ||
+      !lastName.trim() ||
+      !email.trim() ||
       !password ||
       !confirmPassword
     ) {
@@ -54,11 +59,20 @@ function Signup() {
       return;
     }
 
+    if (!healthDataConsent) {
+      setFormError(
+        "Please give consent for HerBloom to collect and use your health data."
+      );
+      return;
+    }
+
     const success = await signUp(
-      firstName,
-      lastName,
-      email,
-      password
+      firstName.trim(),
+      lastName.trim(),
+      email.trim(),
+      password,
+      termsAccepted,
+      healthDataConsent
     );
 
     if (success) {
@@ -68,7 +82,6 @@ function Signup() {
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-16">
-
       <div className="mx-auto max-w-2xl">
 
         {/* HerBloom Branding */}
@@ -164,14 +177,7 @@ function Signup() {
               }
             />
 
-            {/* Error Message */}
-            {(formError || isError) && (
-              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
-                {formError || errMessage}
-              </div>
-            )}
-
-            {/* Terms */}
+            {/* Terms Consent */}
             <div className="flex items-start gap-3">
 
               <input
@@ -188,11 +194,42 @@ function Signup() {
                 htmlFor="terms"
                 className="text-sm leading-5 text-gray-600"
               >
-                I agree to the platform's terms of
-                service and privacy policy.
+                I agree to HerBloom's terms of service
+                and privacy policy.
               </label>
 
             </div>
+
+            {/* Health Data Consent */}
+            <div className="flex items-start gap-3">
+
+              <input
+                type="checkbox"
+                id="healthDataConsent"
+                checked={healthDataConsent}
+                onChange={(event) =>
+                  setHealthDataConsent(event.target.checked)
+                }
+                className="mt-1 h-4 w-4 accent-pink-600"
+              />
+
+              <label
+                htmlFor="healthDataConsent"
+                className="text-sm leading-5 text-gray-600"
+              >
+                I consent to HerBloom collecting and using
+                my health data to provide personalized
+                health tracking and support.
+              </label>
+
+            </div>
+
+            {/* Error Message */}
+            {(formError || isError) && (
+              <div className="rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                {formError || errMessage}
+              </div>
+            )}
 
             {/* Sign Up Button */}
             <button
@@ -225,7 +262,6 @@ function Signup() {
         </div>
 
       </div>
-
     </div>
   );
 }

@@ -37,8 +37,8 @@ interface AuthContextType {
     lastName: string,
     email: string,
     password: string,
-    acceptTerms?: boolean,
-    healthDataConsent?: boolean
+    acceptTerms: boolean,
+    healthDataConsent: boolean
   ) => Promise<boolean>;
 
   logout: () => void;
@@ -57,9 +57,8 @@ export function AuthProvider({
 }: AuthProviderProps) {
   const [user, setUser] = useState<User | null>(null);
 
-  // Checks whether we have finished loading
-  // the saved login information.
-  const [authLoading, setAuthLoading] = useState(true);
+  const [authLoading, setAuthLoading] =
+    useState(true);
 
   const {
     loading,
@@ -92,7 +91,6 @@ export function AuthProvider({
       }
     }
 
-    // We are finished checking localStorage
     setAuthLoading(false);
   }, []);
 
@@ -142,8 +140,8 @@ export function AuthProvider({
       lastName: string,
       email: string,
       password: string,
-      acceptTerms?: boolean,
-      healthDataConsent?: boolean
+      acceptTerms: boolean,
+      healthDataConsent: boolean
     ): Promise<boolean> => {
       const response = await request(() =>
         signUpUser(
@@ -193,7 +191,6 @@ export function AuthProvider({
     localStorage.removeItem("herbloomAccessToken");
     localStorage.removeItem("herbloomRefreshToken");
 
-    // Also remove the old authentication key
     localStorage.removeItem("isAuthenticated");
   }, []);
 

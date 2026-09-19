@@ -18,10 +18,10 @@ function Sidebar() {
   };
 
   return (
-    <aside className="flex min-h-screen w-64 flex-col border-r border-pink-200 bg-gradient-to-b from-pink-100 via-fuchsia-50 to-purple-100">
+    <aside className="sticky top-0 flex h-screen w-64 shrink-0 flex-col overflow-hidden border-r border-pink-200 bg-gradient-to-b from-pink-100 via-fuchsia-50 to-purple-100">
 
       {/* Brand */}
-      <div className="border-b border-pink-200 px-6 py-7">
+      <div className="shrink-0 border-b border-pink-200 px-6 py-7">
         <Link to="/period-tracker">
           <h1 className="text-3xl font-bold tracking-tight text-pink-600">
             HerBloom
@@ -34,7 +34,7 @@ function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-2 overflow-y-auto px-4 py-6">
+      <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 py-6">
 
         {/* Period Tracker */}
         <Link
@@ -114,7 +114,7 @@ function Sidebar() {
           <span>Appointments</span>
         </Link>
 
-        {/* Notifications / Reminders */}
+        {/* Notifications */}
         <Link
           to="/notifications"
           className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
@@ -168,9 +168,10 @@ function Sidebar() {
 
       </nav>
 
-      {/* Logout */}
-      <div className="border-t border-pink-200 p-4">
+      {/* Logout - Pinned to Bottom */}
+      <div className="shrink-0 border-t border-pink-200 bg-white/20 p-4">
         <button
+          type="button"
           onClick={handleLogout}
           className="flex w-full items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold text-gray-700 transition hover:bg-white/70 hover:text-red-600"
         >

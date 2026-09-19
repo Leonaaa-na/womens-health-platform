@@ -6,7 +6,9 @@ function PeriodDashboard() {
   const navigate = useNavigate();
 
   const [cycleDay, setCycleDay] = useState<number | null>(null);
-  const [daysUntilPeriod, setDaysUntilPeriod] = useState<number | null>(null);
+  const [daysUntilPeriod, setDaysUntilPeriod] = useState<number | null>(
+    null
+  );
 
   const savedStartDate =
     localStorage.getItem("periodStartDate") || "";
@@ -49,11 +51,10 @@ function PeriodDashboard() {
   }, [savedStartDate, savedCycleLength]);
 
   return (
-    <div className="min-h-screen bg-pink-50 pb-24">
+    <div className="min-h-screen bg-pink-50 pb-24 md:pb-0">
 
       {/* Header */}
       <header className="bg-white px-5 pb-5 pt-8">
-
         <div className="mx-auto flex max-w-md items-center justify-between">
 
           <div>
@@ -67,6 +68,7 @@ function PeriodDashboard() {
           </div>
 
           <button
+            type="button"
             className="rounded-full bg-pink-50 p-3 text-lg"
             aria-label="Notifications"
           >
@@ -74,7 +76,6 @@ function PeriodDashboard() {
           </button>
 
         </div>
-
       </header>
 
       <main className="mx-auto max-w-md space-y-5 px-5 py-6">
@@ -141,6 +142,7 @@ function PeriodDashboard() {
             </h2>
 
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/flow")
               }
@@ -155,6 +157,7 @@ function PeriodDashboard() {
 
             {/* Flow */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/flow")
               }
@@ -175,6 +178,7 @@ function PeriodDashboard() {
 
             {/* Symptoms */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/symptoms")
               }
@@ -195,6 +199,7 @@ function PeriodDashboard() {
 
             {/* Mood */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/symptoms")
               }
@@ -215,6 +220,7 @@ function PeriodDashboard() {
 
             {/* Stress */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/symptoms")
               }
@@ -235,6 +241,7 @@ function PeriodDashboard() {
 
             {/* Medication */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/medication")
               }
@@ -255,6 +262,7 @@ function PeriodDashboard() {
 
             {/* Nutrition */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/nutrition")
               }
@@ -275,6 +283,7 @@ function PeriodDashboard() {
 
             {/* Wellness */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/wellness")
               }
@@ -295,6 +304,7 @@ function PeriodDashboard() {
 
             {/* Notes */}
             <button
+              type="button"
               onClick={() =>
                 navigate("/period-tracker/notes")
               }
@@ -356,6 +366,7 @@ function PeriodDashboard() {
           </div>
 
           <button
+            type="button"
             onClick={() =>
               navigate("/period-tracker/reports")
             }
@@ -402,6 +413,7 @@ function PeriodDashboard() {
           </div>
 
           <button
+            type="button"
             onClick={() =>
               navigate("/period-tracker/partner-sharing")
             }
@@ -414,12 +426,13 @@ function PeriodDashboard() {
 
       </main>
 
-      {/* Bottom Navigation */}
-      <nav className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
+      {/* Mobile Bottom Navigation */}
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white md:hidden">
 
         <div className="mx-auto flex max-w-md items-center justify-around px-3 py-3">
 
           <button
+            type="button"
             onClick={() =>
               navigate("/period-tracker")
             }
@@ -432,6 +445,7 @@ function PeriodDashboard() {
           </button>
 
           <button
+            type="button"
             onClick={() =>
               navigate("/period-tracker/flow")
             }
@@ -444,6 +458,7 @@ function PeriodDashboard() {
           </button>
 
           <button
+            type="button"
             onClick={() =>
               navigate("/period-tracker")
             }
@@ -456,6 +471,7 @@ function PeriodDashboard() {
           </button>
 
           <button
+            type="button"
             onClick={() =>
               navigate("/period-tracker/reports")
             }
@@ -468,6 +484,10 @@ function PeriodDashboard() {
           </button>
 
           <button
+            type="button"
+            onClick={() =>
+              navigate("/profile")
+            }
             className="flex flex-col items-center gap-1 text-xs text-gray-400"
           >
             <span className="text-xl">

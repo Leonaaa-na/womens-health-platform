@@ -66,14 +66,13 @@ function PregnancyDashboard() {
     : "Not set";
 
   return (
-    <div className="min-h-screen bg-pink-50 pb-24">
+    <div className="min-h-screen bg-pink-50 pb-24 md:pb-0">
 
       {/* =========================
           HEADER
       ========================= */}
 
       <header className="bg-white px-5 pb-5 pt-8 shadow-sm">
-
         <div className="mx-auto flex max-w-md items-center justify-between">
 
           <div>
@@ -96,7 +95,6 @@ function PregnancyDashboard() {
           </button>
 
         </div>
-
       </header>
 
       <main className="mx-auto max-w-md space-y-5 px-5 py-6">
@@ -490,10 +488,10 @@ function PregnancyDashboard() {
       </main>
 
       {/* =========================
-          BOTTOM NAVIGATION
+          MOBILE BOTTOM NAVIGATION
       ========================= */}
 
-      <nav className="fixed bottom-0 left-0 right-0 border-t border-gray-200 bg-white">
+      <nav className="fixed bottom-0 left-0 right-0 z-50 border-t border-gray-200 bg-white md:hidden">
 
         <div className="mx-auto flex max-w-md items-center justify-around px-3 py-3">
 
@@ -552,6 +550,9 @@ function PregnancyDashboard() {
           </button>
 
           <button
+            onClick={() =>
+              navigate("/profile")
+            }
             className="flex flex-col items-center gap-1 text-xs text-gray-400"
           >
             <span className="text-xl">

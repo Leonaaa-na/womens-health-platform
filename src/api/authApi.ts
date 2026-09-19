@@ -80,10 +80,8 @@ export const loginUser = async (
     data: {
       user: validUser,
       tokens: {
-        accessToken:
-          "herbloom-access-token",
-        refreshToken:
-          "herbloom-refresh-token",
+        accessToken: "herbloom-access-token",
+        refreshToken: "herbloom-refresh-token",
       },
     },
   };
@@ -95,11 +93,23 @@ export const signUpUser = async (
   lastName: string,
   email: string,
   password: string,
-  acceptTerms?: boolean,
-  healthDataConsent?: boolean
-
+  acceptTerms: boolean,
+  healthDataConsent: boolean
 ): Promise<AuthResponse> => {
   await delay(1000);
+
+  // Validate required fields
+  if (
+    !firstName.trim() ||
+    !lastName.trim() ||
+    !email.trim()
+  ) {
+    return {
+      success: false,
+      message: "Please provide all required information.",
+      data: null,
+    };
+  }
 
   if (!password.trim()) {
     return {
@@ -109,12 +119,32 @@ export const signUpUser = async (
     };
   }
 
+  // Validate terms consent
+  if (!acceptTerms) {
+    return {
+      success: false,
+      message:
+        "You must accept the terms of service and privacy policy.",
+      data: null,
+    };
+  }
+
+  // Validate health data consent
+  if (!healthDataConsent) {
+    return {
+      success: false,
+      message:
+        "Health data consent is required to create your HerBloom account.",
+      data: null,
+    };
+  }
+
   const newUser: User = {
     id: 2,
-    firstName,
-    lastName,
-    email,
-    username: email.split("@")[0],
+    firstName: firstName.trim(),
+    lastName: lastName.trim(),
+    email: email.trim(),
+    username: email.trim().split("@")[0],
     role: "user",
     isVerified: true,
     profile: {
@@ -122,7 +152,7 @@ export const signUpUser = async (
       bio: "HerBloom community member",
     },
   };
-const response: AuthResponse = {
+
   // Save the newly created account
   // so it can be used during login.
   localStorage.setItem(
@@ -130,6 +160,8 @@ const response: AuthResponse = {
     JSON.stringify({
       user: newUser,
       password,
+      acceptTerms,
+      healthDataConsent,
     })
   );
 
@@ -139,10 +171,8 @@ const response: AuthResponse = {
     data: {
       user: newUser,
       tokens: {
-        accessToken:
-          "herbloom-signup-access-token",
-        refreshToken:
-          "herbloom-signup-refresh-token",
+        accessToken: "herbloom-signup-access-token",
+        refreshToken: "herbloom-signup-refresh-token",
       },
     },
   };
