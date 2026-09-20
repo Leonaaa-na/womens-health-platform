@@ -1,19 +1,17 @@
 import { Link, useLocation, useNavigate } from "react-router-dom";
+import { useAuth } from "../context/AuthContext";
 
 function Sidebar() {
   const location = useLocation();
   const navigate = useNavigate();
+  const { logout } = useAuth();
 
   const isActive = (path: string) => {
     return location.pathname === path;
   };
 
   const handleLogout = () => {
-    localStorage.removeItem("isAuthenticated");
-    localStorage.removeItem("herbloomUser");
-    localStorage.removeItem("herbloomAccessToken");
-    localStorage.removeItem("herbloomRefreshToken");
-
+    logout();
     navigate("/login");
   };
 

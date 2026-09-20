@@ -1,7 +1,7 @@
-import userData from "./json/user.json";
+import apiClient, { ApiSuccessResponse } from "./client";
 
 export interface User {
-  id: number;
+  id: string;
   firstName: string;
   lastName: string;
   email: string;
@@ -16,10 +16,7 @@ export interface User {
 
 export interface AuthData {
   user: User;
-  tokens: {
-    accessToken: string;
-    refreshToken: string;
-  };
+  accessToken: string;
 }
 
 export interface AuthResponse {
@@ -28,63 +25,74 @@ export interface AuthResponse {
   data: AuthData | null;
 }
 
-// Small delay to simulate an API request
-const delay = (ms: number) =>
-  new Promise((resolve) =>
-    setTimeout(resolve, ms)
-  );
+interface BackendUser {
+  id: string;
+  name: string;
+  email: string;
+  role: string;
+  isVerified: boolean;
+  profile?: {
+    username?: string;
+    avatarUrl?: string;
+    bio?: string;
+  };
+}
+
+interface BackendAuthData {
+  user: BackendUser;
+  token: string;
+}
+
+const transformUser = (backendUser: BackendUser): User => {
+  const nameParts = backendUser.name ? backendUser.name.trim().split(/\s+/) : ["", ""];
+  const firstName = nameParts[0] || "";
+  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+
+  return {
+    id: backendUser.id,
+    firstName,
+    lastName,
+    email: backendUser.email,
+    username: backendUser.profile?.username || backendUser.email.split("@")[0],
+    role: backendUser.role,
+    isVerified: backendUser.isVerified,
+    profile: {
+      avatar: backendUser.profile?.avatarUrl || "/images/avatar.png",
+      bio: backendUser.profile?.bio || "",
+    },
+  };
+};
+
+const mapResponse = (response: ApiSuccessResponse<BackendAuthData>): AuthResponse => {
+  return {
+    success: response.success,
+    message: response.message,
+    data: response.data
+      ? {
+          user: transformUser(response.data.user),
+          accessToken: response.data.token,
+        }
+      : null,
+  };
+};
 
 // LOGIN
 export const loginUser = async (
   email: string,
   password: string
 ): Promise<AuthResponse> => {
-  await delay(1000);
-
-  const savedAccount = localStorage.getItem(
-    "herbloomAccount"
-  );
-
-  let validUser = userData.data.user;
-  let validPassword = "HerBloom123";
-
-  // If the user has created an account,
-  // use that account for login.
-  if (savedAccount) {
-    try {
-      const account = JSON.parse(savedAccount);
-
-      validUser = account.user;
-      validPassword = account.password;
-    } catch {
-      localStorage.removeItem("herbloomAccount");
-    }
+  try {
+    const response = await apiClient.post<BackendAuthData>("/users/login", {
+      email,
+      password,
+    });
+    return mapResponse(response.data);
+  } catch (error: unknown) {
+    const message =
+      (error as { response?: { data?: { message?: string } } }).response?.data
+        ?.message || "Invalid email or password.";
+    return { success: false, message, data: null };
   }
-
-  // Check email and password
-  if (
-    email.trim().toLowerCase() !==
-      validUser.email.toLowerCase() ||
-    password !== validPassword
-  ) {
-    return {
-      success: false,
-      message: "Invalid email or password.",
-      data: null,
-    };
-  }
-
-  return {
-    success: true,
-    message: "Login successful",
-    data: {
-      user: validUser,
-      tokens: {
-        accessToken: "herbloom-access-token",
-        refreshToken: "herbloom-refresh-token",
-      },
-    },
-  };
 };
 
 // SIGN UP
@@ -96,84 +104,47 @@ export const signUpUser = async (
   acceptTerms: boolean,
   healthDataConsent: boolean
 ): Promise<AuthResponse> => {
-  await delay(1000);
-
-  // Validate required fields
   if (
     !firstName.trim() ||
     !lastName.trim() ||
     !email.trim()
   ) {
-    return {
-      success: false,
-      message: "Please provide all required information.",
-      data: null,
-    };
+    return { success: false, message: "Please provide all required information.", data: null };
   }
 
   if (!password.trim()) {
-    return {
-      success: false,
-      message: "Password is required.",
-      data: null,
-    };
+    return { success: false, message: "Password is required.", data: null };
   }
 
-  // Validate terms consent
   if (!acceptTerms) {
     return {
       success: false,
-      message:
-        "You must accept the terms of service and privacy policy.",
+      message: "You must accept the terms of service and privacy policy.",
       data: null,
     };
   }
 
-  // Validate health data consent
   if (!healthDataConsent) {
     return {
       success: false,
-      message:
-        "Health data consent is required to create your HerBloom account.",
+      message: "Health data consent is required to create your HerBloom account.",
       data: null,
     };
   }
 
-  const newUser: User = {
-    id: 2,
-    firstName: firstName.trim(),
-    lastName: lastName.trim(),
-    email: email.trim(),
-    username: email.trim().split("@")[0],
-    role: "user",
-    isVerified: true,
-    profile: {
-      avatar: "/images/avatar.png",
-      bio: "HerBloom community member",
-    },
-  };
-
-  // Save the newly created account
-  // so it can be used during login.
-  localStorage.setItem(
-    "herbloomAccount",
-    JSON.stringify({
-      user: newUser,
+  try {
+    const response = await apiClient.post<BackendAuthData>("/users/register", {
+      name: `${firstName.trim()} ${lastName.trim()}`,
+      email: email.trim(),
       password,
       acceptTerms,
       healthDataConsent,
-    })
-  );
-
-  return {
-    success: true,
-    message: "Account created successfully",
-    data: {
-      user: newUser,
-      tokens: {
-        accessToken: "herbloom-signup-access-token",
-        refreshToken: "herbloom-signup-refresh-token",
-      },
-    },
-  };
+    });
+    return mapResponse(response.data);
+  } catch (error: unknown) {
+    const message =
+      (error as { response?: { data?: { message?: string } } }).response?.data
+        ?.message || "Unable to create account.";
+    return { success: false, message, data: null };
+  }
 };

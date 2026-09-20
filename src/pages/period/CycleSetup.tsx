@@ -1,5 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../api/client";
 
 function CycleSetup() {
   const navigate = useNavigate();
@@ -7,15 +8,40 @@ function CycleSetup() {
   const [startDate, setStartDate] = useState("");
   const [cycleLength, setCycleLength] = useState("28");
   const [periodLength, setPeriodLength] = useState("5");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
 
-  const handleSubmit = (event: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (event: React.FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
-    localStorage.setItem("periodStartDate", startDate);
-    localStorage.setItem("cycleLength", cycleLength);
-    localStorage.setItem("periodLength", periodLength);
+    if (!startDate) return;
 
-    navigate("/period-tracker");
+    setLoading(true);
+    setError("");
+
+    try {
+      await apiClient.post("/cycles", {
+        startDate,
+        endDate: "",
+        notes: "",
+      });
+
+      // Also update the profile with cycle length info
+      await apiClient.put("/profile", {
+        averageCycleLength: Number(cycleLength),
+        averagePeriodLength: Number(periodLength),
+        lastPeriodDate: startDate,
+      });
+
+      navigate("/period-tracker");
+    } catch (error: unknown) {
+      const message =
+        (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Could not save cycle setup.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -125,12 +151,19 @@ function CycleSetup() {
             </div>
           </div>
 
+           {error && (
+            <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+              {error}
+            </div>
+          )}
+
           {/* Continue */}
           <button
             type="submit"
-            className="w-full rounded-xl bg-pink-600 py-3.5 font-semibold text-white transition hover:bg-pink-700"
+            disabled={loading}
+            className="w-full rounded-xl bg-pink-600 py-3.5 font-semibold text-white transition hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
           >
-            Continue
+            {loading ? "Saving..." : "Continue"}
           </button>
 
         </form>

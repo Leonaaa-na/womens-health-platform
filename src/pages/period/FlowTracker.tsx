@@ -1,11 +1,11 @@
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../api/client";
 
 type FlowEntry = {
-  id: number;
+  id: string;
   date: string;
   flow: string;
-  products: string;
   notes: string;
 };
 
@@ -17,18 +17,35 @@ function FlowTracker() {
   );
 
   const [flow, setFlow] = useState("");
-
-  const [products, setProducts] = useState("");
-
   const [notes, setNotes] = useState("");
-
   const [message, setMessage] = useState("");
 
-  const [entries, setEntries] = useState<FlowEntry[]>(() => {
-    const saved = localStorage.getItem("flowEntries");
+  const [entries, setEntries] = useState<FlowEntry[]>([]);
 
-    return saved ? JSON.parse(saved) : [];
-  });
+  useEffect(() => {
+    const loadLogs = async () => {
+      try {
+        const response = await apiClient.get("/cycles/logs?limit=30");
+        if (response.data.success && response.data.data) {
+          const logs = response.data.data.map((log: {
+            id: string;
+            date: string;
+            flow: string;
+            notes: string | null;
+          }) => ({
+            id: log.id,
+            date: log.date,
+            flow: log.flow || "",
+            notes: log.notes || "",
+          }));
+          setEntries(logs);
+        }
+      } catch {
+        setEntries([]);
+      }
+    };
+    loadLogs();
+  }, []);
 
   const flowOptions = [
     {
@@ -53,7 +70,7 @@ function FlowTracker() {
     },
   ];
 
-  const handleSave = (event: React.FormEvent) => {
+  const handleSave = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!flow) {
@@ -61,28 +78,35 @@ function FlowTracker() {
       return;
     }
 
-    const newEntry: FlowEntry = {
-      id: Date.now(),
-      date,
-      flow,
-      products,
-      notes,
-    };
+    setMessage("");
 
-    const updatedEntries = [newEntry, ...entries];
+    try {
+      const response = await apiClient.post("/cycles/logs", {
+        date,
+        flow,
+        symptoms: [],
+        notes,
+      });
 
-    setEntries(updatedEntries);
-
-    localStorage.setItem(
-      "flowEntries",
-      JSON.stringify(updatedEntries)
-    );
-
-    setMessage("Flow entry saved successfully 🌸");
-
-    setFlow("");
-    setProducts("");
-    setNotes("");
+      if (response.data.success) {
+        const log = response.data.data;
+        const newEntry: FlowEntry = {
+          id: log.id,
+          date: log.date,
+          flow: log.flow,
+          notes: log.notes || "",
+        };
+        setEntries((prev) => [newEntry, ...prev]);
+        setMessage("Flow entry saved successfully 🌸");
+        setFlow("");
+        setNotes("");
+      }
+    } catch (error: unknown) {
+      const message =
+        (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Could not save flow entry.";
+      setMessage(message);
+    }
   };
 
   return (
@@ -204,30 +228,7 @@ function FlowTracker() {
 
             </div>
 
-            {/* Products Used */}
-            <div>
-
-              <label className="mb-2 block text-sm font-semibold text-gray-700">
-                Pads or tampons used
-                <span className="ml-1 font-normal text-gray-400">
-                  (optional)
-                </span>
-              </label>
-
-              <input
-                type="number"
-                min="0"
-                value={products}
-                onChange={(event) =>
-                  setProducts(event.target.value)
-                }
-                placeholder="e.g. 3"
-                className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 outline-none focus:border-pink-400"
-              />
-
-            </div>
-
-            {/* Notes */}
+             {/* Notes */}
             <div>
 
               <label className="mb-2 block text-sm font-semibold text-gray-700">
@@ -392,17 +393,11 @@ function FlowTracker() {
 
                   </div>
 
-                  {entry.products && (
-                    <p className="mt-3 text-xs text-gray-600">
-                      Products used: {entry.products}
-                    </p>
-                  )}
-
-                  {entry.notes && (
-                    <p className="mt-2 text-xs text-gray-600">
-                      Note: {entry.notes}
-                    </p>
-                  )}
+                   {entry.notes && (
+                     <p className="mt-2 text-xs text-gray-600">
+                       Note: {entry.notes}
+                     </p>
+                   )}
 
                 </div>
               ))}

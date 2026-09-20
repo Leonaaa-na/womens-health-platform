@@ -1,7 +1,13 @@
 import { useEffect, useState } from "react";
+import apiClient, { ApiErrorResponse } from "../api/client";
+import {
+  fetchReminders,
+  toggleReminderComplete,
+  type HerBloomReminder,
+} from "../services/reminderService";
 
 interface Reminder {
-  id: number;
+  id: string;
   title: string;
   type: string;
   date: string;
@@ -34,110 +40,81 @@ const defaultSettings: NotificationSettings = {
 };
 
 const NotificationPopup = () => {
-  const [notification, setNotification] =
-    useState<Reminder | null>(null);
+  const [notification, setNotification] = useState<Reminder | null>(null);
 
   useEffect(() => {
-    const checkForNotifications = () => {
-      const savedReminders = localStorage.getItem(
-        "herbloomReminders"
-      );
-
-      if (!savedReminders) {
-        return;
-      }
-
-      let reminders: Reminder[] = [];
-
+    const loadDueReminder = async () => {
       try {
-        reminders = JSON.parse(savedReminders);
-      } catch {
-        return;
-      }
+        const settingsResponse = await apiClient.get<NotificationSettings>("/users/notification-settings");
+        let resolvedSettings = defaultSettings;
+        if (settingsResponse.data.success) {
+          const merged = { ...defaultSettings, ...settingsResponse.data.data };
+          resolvedSettings = merged;
+        }
 
-      const savedSettings = localStorage.getItem(
-        "herbloomNotificationSettings"
-      );
+        if (!resolvedSettings.notificationsEnabled) {
+          return;
+        }
 
-      let settings = defaultSettings;
+        const reminders: HerBloomReminder[] = await fetchReminders({ upcoming: "true" });
 
-      if (savedSettings) {
-        try {
-          settings = {
-            ...defaultSettings,
-            ...JSON.parse(savedSettings),
+        const today = new Date().toISOString().split("T")[0];
+        const currentTime = new Date();
+
+        const enabledTypes: Record<string, boolean> = {
+          period: resolvedSettings.periodNotifications,
+          pregnancy: resolvedSettings.pregnancyNotifications,
+          medication: resolvedSettings.medicationNotifications,
+          appointment: resolvedSettings.appointmentNotifications,
+          wellness: resolvedSettings.wellnessNotifications,
+          custom: true,
+        };
+
+        const dueReminder = reminders.find((reminder) => {
+          if (reminder.completed) return false;
+          if (reminder.date !== today) return false;
+          if (enabledTypes[reminder.type] === false) return false;
+
+          if (!reminder.time) return true;
+
+          const reminderDate = new Date(`${reminder.date}T${reminder.time}`);
+          return reminderDate <= currentTime;
+        });
+
+        if (dueReminder) {
+          const mapped: Reminder = {
+            id: dueReminder.id,
+            title: dueReminder.title,
+            type: dueReminder.type,
+            date: dueReminder.date,
+            time: dueReminder.time,
+            notes: dueReminder.notes,
+            completed: dueReminder.completed,
+            automatic: dueReminder.automatic,
           };
-        } catch {
-          settings = defaultSettings;
+          setNotification(mapped);
+
+          if (
+            "Notification" in window &&
+            Notification.permission === "granted"
+          ) {
+            new Notification("HerBloom Reminder", {
+              body: dueReminder.title,
+            });
+          }
+
+          if (resolvedSettings.vibration && "vibrate" in navigator) {
+            navigator.vibrate([200, 100, 200]);
+          }
         }
-      }
-
-      if (!settings.notificationsEnabled) {
-        return;
-      }
-
-      const today = new Date()
-        .toISOString()
-        .split("T")[0];
-
-      const currentTime = new Date();
-
-      const enabledTypes: Record<string, boolean> = {
-        Period: settings.periodNotifications,
-        Pregnancy: settings.pregnancyNotifications,
-        Medication: settings.medicationNotifications,
-        Appointment: settings.appointmentNotifications,
-        Wellness: settings.wellnessNotifications,
-      };
-
-      const dueReminder = reminders.find((reminder) => {
-        if (reminder.completed) {
-          return false;
-        }
-
-        if (reminder.date !== today) {
-          return false;
-        }
-
-        if (enabledTypes[reminder.type] === false) {
-          return false;
-        }
-
-        if (!reminder.time) {
-          return true;
-        }
-
-        const reminderDate = new Date(
-          `${reminder.date} ${reminder.time}`
-        );
-
-        return reminderDate <= currentTime;
-      });
-
-      if (dueReminder) {
-        setNotification(dueReminder);
-
-        if (
-          "Notification" in window &&
-          Notification.permission === "granted"
-        ) {
-          new Notification("HerBloom Reminder", {
-            body: dueReminder.title,
-          });
-        }
-
-        if (settings.vibration && "vibrate" in navigator) {
-          navigator.vibrate([200, 100, 200]);
-        }
+      } catch {
+        // Gracefully ignore — no due reminder or offline
       }
     };
 
-    checkForNotifications();
+    loadDueReminder();
 
-    const interval = window.setInterval(
-      checkForNotifications,
-      60000
-    );
+    const interval = window.setInterval(loadDueReminder, 60000);
 
     return () => {
       window.clearInterval(interval);
@@ -152,33 +129,15 @@ const NotificationPopup = () => {
     setNotification(null);
   };
 
-  const markAsCompleted = () => {
-    const saved = localStorage.getItem(
-      "herbloomReminders"
-    );
-
-    if (saved) {
-      try {
-        const reminders: Reminder[] = JSON.parse(saved);
-
-        const updated = reminders.map((reminder) =>
-          reminder.id === notification.id
-            ? {
-                ...reminder,
-                completed: true,
-              }
-            : reminder
-        );
-
-        localStorage.setItem(
-          "herbloomReminders",
-          JSON.stringify(updated)
-        );
-      } catch {
-        // Ignore invalid data
+  const markAsCompleted = async () => {
+    try {
+      await toggleReminderComplete(notification.id);
+    } catch (err: unknown) {
+      const apiError = err as { response?: { data?: ApiErrorResponse } };
+      if (apiError?.response?.status === 401) {
+        // session expired — popup will be dismissed on logout
       }
     }
-
     setNotification(null);
   };
 

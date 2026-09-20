@@ -1,51 +1,62 @@
 import { useSearchParams, useNavigate } from "react-router-dom";
-import { useState } from "react";
+import { useState, useEffect } from "react";
+import { getPlans, initializePayment } from "../../services/premiumService";
+import type { PremiumPlan } from "../../services/premiumService";
 
 const PremiumCheckout = () => {
   const [searchParams] = useSearchParams();
   const navigate = useNavigate();
 
-  const selectedPlan = searchParams.get("plan");
+  const selectedPlanId = searchParams.get("plan");
 
   const [isLoading, setIsLoading] = useState(false);
   const [error, setError] = useState("");
+  const [plans, setPlans] = useState<PremiumPlan[]>([]);
 
-  const plans = {
-    monthly: {
-      name: "Monthly Premium",
-      price: "GH₵20",
-      amount: 20,
-      period: "per month",
-    },
-    yearly: {
-      name: "Yearly Premium",
-      price: "GH₵200",
-      amount: 200,
-      period: "per year",
-    },
+  useEffect(() => {
+    loadPlans();
+  }, []);
+
+  const loadPlans = async () => {
+    try {
+      const result = await getPlans();
+      setPlans(result.plans);
+    } catch {
+      setPlans([]);
+    }
   };
 
   const plan =
-    selectedPlan === "yearly"
-      ? plans.yearly
-      : selectedPlan === "monthly"
-        ? plans.monthly
+    selectedPlanId === "yearly"
+      ? plans.find((p) => p.id === "yearly")
+      : selectedPlanId === "monthly"
+        ? plans.find((p) => p.id === "monthly")
         : null;
 
-  if (!plan) {
+  const fallbackPlans = {
+    monthly: { name: "Monthly Premium", price: "GH₵20", amount: 20, period: "per month" },
+    yearly: { name: "Yearly Premium", price: "GH₵200", amount: 200, period: "per year" },
+  };
+
+  const displayPlan = plan
+    ? { name: plan.name, price: `GH₵${plan.price}`, amount: plan.price, period: plan.description }
+    : selectedPlanId === "yearly"
+      ? fallbackPlans.yearly
+      : selectedPlanId === "monthly"
+        ? fallbackPlans.monthly
+        : null;
+
+  if (!displayPlan) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-6 py-10">
         <div className="mx-auto max-w-xl rounded-3xl bg-white p-10 text-center shadow-lg">
           <div className="mb-4 text-5xl">💎</div>
-
           <h1 className="text-2xl font-bold text-gray-800">
             No Premium Plan Selected
           </h1>
-
           <p className="mt-3 text-gray-600">
             Please return to the Premium Plans page and choose a plan.
           </p>
-
           <button
             onClick={() => navigate("/premium/plans")}
             className="mt-6 rounded-xl bg-pink-500 px-6 py-3 font-semibold text-white hover:bg-pink-600"
@@ -62,46 +73,16 @@ const PremiumCheckout = () => {
     setIsLoading(true);
 
     try {
-      const token = localStorage.getItem("herbloomAccessToken");
+      const result = await initializePayment(selectedPlanId!);
 
-      if (!token) {
-        navigate("/login");
-        return;
-      }
-
-      const backendUrl =
-        import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-      const response = await fetch(`${backendUrl}/payment/initialize`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-          Authorization: `Bearer ${token}`,
-        },
-        body: JSON.stringify({
-          purpose: "subscription",
-          plan: selectedPlan,
-        }),
-      });
-
-      const result = await response.json();
-
-      if (!response.ok || !result.success) {
-        throw new Error(
-          result.message || "Unable to initialize payment."
-        );
-      }
-
-      const authorizationUrl = result.data?.authorizationUrl;
-
-      if (!authorizationUrl) {
+      if (!result.authorizationUrl) {
         throw new Error(
           "Payment was initialized, but no Paystack payment link was returned."
         );
       }
 
-      window.location.href = authorizationUrl;
-    } catch (err) {
+      window.location.href = result.authorizationUrl;
+    } catch (err: unknown) {
       setError(
         err instanceof Error
           ? err.message
@@ -114,82 +95,50 @@ const PremiumCheckout = () => {
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-6 py-10">
       <div className="mx-auto max-w-4xl">
-
         {/* Header */}
         <div className="mb-8 text-center">
           <div className="mb-3 text-5xl">💎</div>
-
           <h1 className="text-3xl font-bold text-gray-800">
             HerBloom Premium Checkout
           </h1>
-
           <p className="mt-2 text-gray-600">
             Review your subscription before continuing.
           </p>
         </div>
 
         <div className="grid gap-6 md:grid-cols-2">
-
           {/* Subscription Summary */}
           <div className="rounded-3xl border border-pink-100 bg-white p-7 shadow-sm">
             <h2 className="text-xl font-bold text-gray-800">
               Subscription Summary
             </h2>
-
             <div className="mt-6 rounded-2xl bg-gradient-to-r from-pink-50 to-purple-50 p-5">
               <div className="flex items-center gap-3">
-                <div className="rounded-xl bg-pink-500 p-3 text-xl">
-                  💎
-                </div>
-
+                <div className="rounded-xl bg-pink-500 p-3 text-xl">💎</div>
                 <div>
-                  <h3 className="font-bold text-gray-800">
-                    {plan.name}
-                  </h3>
-
-                  <p className="text-sm text-gray-500">
-                    HerBloom Premium
-                  </p>
+                  <h3 className="font-bold text-gray-800">{displayPlan.name}</h3>
+                  <p className="text-sm text-gray-500">HerBloom Premium</p>
                 </div>
               </div>
-
               <div className="mt-6">
-                <span className="text-3xl font-bold text-pink-600">
-                  {plan.price}
-                </span>
-
-                <span className="ml-2 text-sm text-gray-500">
-                  {plan.period}
-                </span>
+                <span className="text-3xl font-bold text-pink-600">{displayPlan.price}</span>
+                <span className="ml-2 text-sm text-gray-500">{displayPlan.period}</span>
               </div>
             </div>
 
             <div className="mt-6 space-y-3">
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Plan</span>
-
-                <span className="font-semibold text-gray-800">
-                  {plan.name}
-                </span>
+                <span className="font-semibold text-gray-800">{displayPlan.name}</span>
               </div>
-
               <div className="flex justify-between text-sm">
                 <span className="text-gray-600">Billing</span>
-
-                <span className="font-semibold text-gray-800">
-                  {plan.period}
-                </span>
+                <span className="font-semibold text-gray-800">{displayPlan.period}</span>
               </div>
-
               <div className="border-t pt-3">
                 <div className="flex justify-between">
-                  <span className="font-bold text-gray-800">
-                    Total
-                  </span>
-
-                  <span className="font-bold text-pink-600">
-                    {plan.price}
-                  </span>
+                  <span className="font-bold text-gray-800">Total</span>
+                  <span className="font-bold text-pink-600">{displayPlan.price}</span>
                 </div>
               </div>
             </div>
@@ -200,7 +149,6 @@ const PremiumCheckout = () => {
             <h2 className="text-xl font-bold text-gray-800">
               Payment
             </h2>
-
             <p className="mt-2 text-sm text-gray-500">
               You will be redirected to Paystack to complete the
               payment securely.
@@ -210,12 +158,10 @@ const PremiumCheckout = () => {
             <div className="mt-6 rounded-2xl border border-green-100 bg-green-50 p-5">
               <div className="flex gap-3">
                 <span className="text-xl">🔐</span>
-
                 <div>
                   <h3 className="font-bold text-green-800">
                     Secure Payment
                   </h3>
-
                   <p className="mt-1 text-sm text-green-700">
                     HerBloom does not collect or store your card
                     details. Payment is handled by Paystack.
@@ -229,7 +175,6 @@ const PremiumCheckout = () => {
               <h3 className="font-semibold text-gray-800">
                 What happens next?
               </h3>
-
               <ol className="mt-3 space-y-3 text-sm text-gray-600">
                 <li>1. Confirm your selected plan.</li>
                 <li>2. Continue to Paystack.</li>
@@ -252,9 +197,7 @@ const PremiumCheckout = () => {
               disabled={isLoading}
               className="mt-7 w-full rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-4 font-bold text-white shadow-md transition hover:from-pink-600 hover:to-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              {isLoading
-                ? "Connecting to Paystack..."
-                : "Continue to Payment →"}
+              {isLoading ? "Connecting to Paystack..." : "Continue to Payment →"}
             </button>
 
             <button

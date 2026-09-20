@@ -1,13 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../api/client";
 
 function PregnancySetup() {
   const navigate = useNavigate();
 
   const [dueDate, setDueDate] = useState("");
   const [message, setMessage] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleSubmit = (event: React.FormEvent) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!dueDate) {
@@ -15,13 +17,28 @@ function PregnancySetup() {
       return;
     }
 
-    localStorage.setItem("pregnancyDueDate", dueDate);
+    setLoading(true);
+    setMessage("");
 
-    setMessage("Your pregnancy information has been saved 🌸");
+    try {
+      await apiClient.post("/pregnancy", {
+        dueDate,
+        isFirstPregnancy: true,
+      });
 
-    setTimeout(() => {
-      navigate("/pregnancy-tracker");
-    }, 800);
+      setMessage("Your pregnancy information has been saved 🌸");
+
+      setTimeout(() => {
+        navigate("/pregnancy-tracker");
+      }, 800);
+    } catch (error: unknown) {
+      const msg =
+        (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Could not save pregnancy setup.";
+      setMessage(msg);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -124,9 +141,10 @@ function PregnancySetup() {
 
             <button
               type="submit"
-              className="w-full rounded-xl bg-pink-600 py-3 font-semibold text-white transition hover:bg-pink-700"
+              disabled={loading}
+              className="w-full rounded-xl bg-pink-600 py-3 font-semibold text-white transition hover:bg-pink-700 disabled:cursor-not-allowed disabled:opacity-60"
             >
-              Save & Continue
+              {loading ? "Saving..." : "Save & Continue"}
             </button>
 
           </form>

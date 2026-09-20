@@ -1,5 +1,6 @@
 import { useState, type FormEvent } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../api/client";
 
 const AccountSecurity = () => {
   const navigate = useNavigate();
@@ -10,8 +11,9 @@ const AccountSecurity = () => {
 
   const [message, setMessage] = useState("");
   const [error, setError] = useState("");
+  const [loading, setLoading] = useState(false);
 
-  const handleChangePassword = (event: FormEvent<HTMLFormElement>) => {
+  const handleChangePassword = async (event: FormEvent<HTMLFormElement>) => {
     event.preventDefault();
 
     setMessage("");
@@ -22,8 +24,8 @@ const AccountSecurity = () => {
       return;
     }
 
-    if (newPassword.length < 8) {
-      setError("Your new password must be at least 8 characters long.");
+    if (newPassword.length < 6) {
+      setError("Your new password must be at least 6 characters long.");
       return;
     }
 
@@ -32,11 +34,29 @@ const AccountSecurity = () => {
       return;
     }
 
-    setMessage("Password change request saved successfully.");
+    setLoading(true);
+    try {
+      const response = await apiClient.put("/users/change-password", {
+        currentPassword,
+        newPassword,
+      });
 
-    setCurrentPassword("");
-    setNewPassword("");
-    setConfirmPassword("");
+      if (response.data.success) {
+        setMessage("Password changed successfully.");
+        setCurrentPassword("");
+        setNewPassword("");
+        setConfirmPassword("");
+      } else {
+        setError(response.data.message || "Could not change password.");
+      }
+    } catch (error: unknown) {
+      const message =
+        (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        "Could not change password.";
+      setError(message);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
@@ -190,9 +210,10 @@ const AccountSecurity = () => {
 
               <button
                 type="submit"
-                className="flex-1 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-bold text-white shadow-md transition hover:from-pink-600 hover:to-purple-700"
+                disabled={loading}
+                className="flex-1 rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3 font-bold text-white shadow-md transition hover:from-pink-600 hover:to-purple-700 disabled:cursor-not-allowed disabled:opacity-60"
               >
-                🔒 Change Password
+                {loading ? "Saving..." : "🔒 Change Password"}
               </button>
 
               <button

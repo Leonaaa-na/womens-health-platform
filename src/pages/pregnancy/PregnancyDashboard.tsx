@@ -1,46 +1,61 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import apiClient from "../../api/client";
+
+interface PregnancyData {
+  dueDate: string;
+  currentWeek: number | null;
+  daysRemaining: number | null;
+  daysPregnant: number;
+  trimester: string;
+}
 
 function PregnancyDashboard() {
   const navigate = useNavigate();
 
-  const [dueDate, setDueDate] = useState("");
-  const [currentWeek, setCurrentWeek] = useState<number | null>(null);
-  const [daysRemaining, setDaysRemaining] = useState<number | null>(null);
+  const [pregnancy, setPregnancy] = useState<PregnancyData>({
+    dueDate: "",
+    currentWeek: null,
+    daysRemaining: null,
+    daysPregnant: 0,
+    trimester: "",
+  });
+  const [loading, setLoading] = useState(true);
 
   useEffect(() => {
-    const savedDueDate = localStorage.getItem("pregnancyDueDate");
+    const fetchPregnancy = async () => {
+      try {
+        const response = await apiClient.get<{
+          pregnancy: { dueDate: string; lastMenstrualPeriod: string };
+          currentWeek: number;
+          trimester: string;
+          daysPregnant: number;
+          daysUntilDue: number;
+        }>("/pregnancy/current");
 
-    if (!savedDueDate) {
-      return;
-    }
+        if (response.data.success && response.data.data) {
+          const d = response.data.data;
+          setPregnancy({
+            dueDate: d.pregnancy.dueDate,
+            currentWeek: d.currentWeek,
+            daysRemaining: Math.max(0, d.daysUntilDue),
+            daysPregnant: d.daysPregnant,
+            trimester: d.trimester,
+          });
+        }
+      } catch {
+        // No active pregnancy
+      } finally {
+        setLoading(false);
+      }
+    };
 
-    setDueDate(savedDueDate);
-
-    const due = new Date(savedDueDate);
-    const today = new Date();
-
-    due.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-
-    const difference = due.getTime() - today.getTime();
-
-    const remainingDays = Math.ceil(
-      difference / (1000 * 60 * 60 * 24)
-    );
-
-    const pregnancyLength = 280;
-    const daysPregnant = pregnancyLength - remainingDays;
-
-    const calculatedWeek = Math.floor(daysPregnant / 7) + 1;
-
-    setDaysRemaining(Math.max(remainingDays, 0));
-
-    setCurrentWeek(
-      Math.min(Math.max(calculatedWeek, 1), 40)
-    );
+    fetchPregnancy();
   }, []);
 
+  const currentWeek = pregnancy.currentWeek;
+  const daysRemaining = pregnancy.daysRemaining;
+  const dueDate = pregnancy.dueDate;
   const progress =
     currentWeek !== null
       ? Math.min((currentWeek / 40) * 100, 100)
@@ -64,6 +79,14 @@ function PregnancyDashboard() {
         year: "numeric",
       })
     : "Not set";
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-pink-50">
+        <p className="text-gray-600">Loading pregnancy data...</p>
+      </div>
+    );
+  }
 
   return (
     <div className="min-h-screen bg-pink-50 pb-24 md:pb-0">
