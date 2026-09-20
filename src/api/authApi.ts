@@ -1,4 +1,5 @@
-import apiClient, { ApiSuccessResponse } from "./client";
+import apiClient from "./client";
+import type { ApiSuccessResponse } from "./client";
 
 export interface User {
   id: string;
@@ -8,6 +9,7 @@ export interface User {
   username: string;
   role: string;
   isVerified: boolean;
+
   profile: {
     avatar: string;
     bio: string;
@@ -17,6 +19,7 @@ export interface User {
 export interface AuthData {
   user: User;
   accessToken: string;
+  refreshToken: string;
 }
 
 export interface AuthResponse {
@@ -31,6 +34,7 @@ interface BackendUser {
   email: string;
   role: string;
   isVerified: boolean;
+
   profile?: {
     username?: string;
     avatarUrl?: string;
@@ -38,64 +42,183 @@ interface BackendUser {
   };
 }
 
-interface BackendAuthData {
-  user: BackendUser;
-  token: string;
+interface BackendTokens {
+  accessToken?: string;
+  refreshToken?: string;
 }
 
-const transformUser = (backendUser: BackendUser): User => {
-  const nameParts = backendUser.name ? backendUser.name.trim().split(/\s+/) : ["", ""];
-  const firstName = nameParts[0] || "";
-  const lastName = nameParts.length > 1 ? nameParts.slice(1).join(" ") : "";
+interface BackendAuthData {
+  user: BackendUser;
+
+  /*
+   * Different backend responses can use
+   * either token/accessToken or tokens.
+   */
+  token?: string;
+  accessToken?: string;
+  refreshToken?: string;
+
+  tokens?: BackendTokens;
+}
+
+const transformUser = (
+  backendUser: BackendUser
+): User => {
+  const nameParts = backendUser.name
+    ? backendUser.name
+        .trim()
+        .split(/\s+/)
+    : ["", ""];
+
+  const firstName =
+    nameParts[0] || "";
+
+  const lastName =
+    nameParts.length > 1
+      ? nameParts.slice(1).join(" ")
+      : "";
 
   return {
     id: backendUser.id,
+
     firstName,
+
     lastName,
+
     email: backendUser.email,
-    username: backendUser.profile?.username || backendUser.email.split("@")[0],
+
+    username:
+      backendUser.profile?.username ||
+      backendUser.email.split("@")[0],
+
     role: backendUser.role,
-    isVerified: backendUser.isVerified,
+
+    isVerified:
+      backendUser.isVerified,
+
     profile: {
-      avatar: backendUser.profile?.avatarUrl || "/images/avatar.png",
-      bio: backendUser.profile?.bio || "",
+      avatar:
+        backendUser.profile?.avatarUrl ||
+        "/images/avatar.png",
+
+      bio:
+        backendUser.profile?.bio || "",
     },
   };
 };
 
-const mapResponse = (response: ApiSuccessResponse<BackendAuthData>): AuthResponse => {
+/*
+ * Convert the backend authentication
+ * response into the format used by
+ * the HerBloom frontend.
+ */
+const mapResponse = (
+  response: ApiSuccessResponse<BackendAuthData>
+): AuthResponse => {
+  const backendData =
+    response.data;
+
+  if (!backendData) {
+    return {
+      success: response.success,
+      message:
+        response.message || "",
+      data: null,
+    };
+  }
+
+  const accessToken =
+    backendData.tokens?.accessToken ||
+    backendData.accessToken ||
+    backendData.token ||
+    "";
+
+  const refreshToken =
+    backendData.tokens?.refreshToken ||
+    backendData.refreshToken ||
+    "";
+
   return {
     success: response.success,
-    message: response.message,
-    data: response.data
-      ? {
-          user: transformUser(response.data.user),
-          accessToken: response.data.token,
-        }
-      : null,
+
+    message:
+      response.message || "",
+
+    data: {
+      user: transformUser(
+        backendData.user
+      ),
+
+      accessToken,
+
+      refreshToken,
+    },
   };
 };
 
+
+// =====================================================
 // LOGIN
+// =====================================================
+
 export const loginUser = async (
   email: string,
   password: string
 ): Promise<AuthResponse> => {
   try {
-    const response = await apiClient.post<BackendAuthData>("/users/login", {
-      email,
-      password,
-    });
-    return mapResponse(response.data);
+    /*
+     * IMPORTANT:
+     * The backend response itself has:
+     *
+     * success
+     * message
+     * data
+     *
+     * Therefore the generic must be
+     * ApiSuccessResponse<BackendAuthData>.
+     */
+    const response =
+      await apiClient.post<
+        ApiSuccessResponse<BackendAuthData>
+      >(
+        "/users/login",
+        {
+          email,
+          password,
+        }
+      );
+
+    return mapResponse(
+      response.data
+    );
   } catch (error: unknown) {
     const message =
-      (error as { response?: { data?: { message?: string } } }).response?.data
-        ?.message || "Invalid email or password.";
-    return { success: false, message, data: null };
+      (
+        error as {
+          response?: {
+            data?: {
+              message?: string;
+            };
+          };
+        }
+      ).response?.data?.message ||
+      "Invalid email or password.";
+
+    return {
+      success: false,
+
+      message,
+
+      data: null,
+    };
   }
 };
 
+
+// =====================================================
 // SIGN UP
+// =====================================================
+
 export const signUpUser = async (
   firstName: string,
   lastName: string,
@@ -104,22 +227,40 @@ export const signUpUser = async (
   acceptTerms: boolean,
   healthDataConsent: boolean
 ): Promise<AuthResponse> => {
+
   if (
     !firstName.trim() ||
     !lastName.trim() ||
     !email.trim()
   ) {
-    return { success: false, message: "Please provide all required information.", data: null };
+    return {
+      success: false,
+
+      message:
+        "Please provide all required information.",
+
+      data: null,
+    };
   }
 
   if (!password.trim()) {
-    return { success: false, message: "Password is required.", data: null };
+    return {
+      success: false,
+
+      message:
+        "Password is required.",
+
+      data: null,
+    };
   }
 
   if (!acceptTerms) {
     return {
       success: false,
-      message: "You must accept the terms of service and privacy policy.",
+
+      message:
+        "You must accept the terms of service and privacy policy.",
+
       data: null,
     };
   }
@@ -127,24 +268,56 @@ export const signUpUser = async (
   if (!healthDataConsent) {
     return {
       success: false,
-      message: "Health data consent is required to create your HerBloom account.",
+
+      message:
+        "Health data consent is required to create your HerBloom account.",
+
       data: null,
     };
   }
 
   try {
-    const response = await apiClient.post<BackendAuthData>("/users/register", {
-      name: `${firstName.trim()} ${lastName.trim()}`,
-      email: email.trim(),
-      password,
-      acceptTerms,
-      healthDataConsent,
-    });
-    return mapResponse(response.data);
+    const response =
+      await apiClient.post<
+        ApiSuccessResponse<BackendAuthData>
+      >(
+        "/users/register",
+        {
+          name: `${firstName.trim()} ${lastName.trim()}`,
+
+          email:
+            email.trim(),
+
+          password,
+
+          acceptTerms,
+
+          healthDataConsent,
+        }
+      );
+
+    return mapResponse(
+      response.data
+    );
   } catch (error: unknown) {
     const message =
-      (error as { response?: { data?: { message?: string } } }).response?.data
-        ?.message || "Unable to create account.";
-    return { success: false, message, data: null };
+      (
+        error as {
+          response?: {
+            data?: {
+              message?: string;
+            };
+          };
+        }
+      ).response?.data?.message ||
+      "Unable to create account.";
+
+    return {
+      success: false,
+
+      message,
+
+      data: null,
+    };
   }
 };

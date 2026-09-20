@@ -292,8 +292,14 @@ function AppRoutes() {
               element={<HealthArticles />}
             />
 
+            {/* Supports both article URL formats */}
             <Route
               path="/health-library/articles/:id"
+              element={<HealthArticleDetails />}
+            />
+
+            <Route
+              path="/health-library/article/:id"
               element={<HealthArticleDetails />}
             />
 

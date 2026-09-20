@@ -2,6 +2,7 @@ export interface HealthArticle {
   id: number;
   title: string;
   category: string;
+  categorySlug: string;
   type: "Medical Article" | "Personal Experience";
   author: string;
   source: string;
@@ -12,219 +13,190 @@ export interface HealthArticle {
 }
 
 export const healthArticles: HealthArticle[] = [
-  // =========================
-  // MENSTRUAL HEALTH
-  // =========================
-
   {
     id: 1,
-    title: "Menstrual Health",
+    title: "Menstrual Health and the Menstrual Cycle",
     category: "Menstrual Health",
+    categorySlug: "menstrual-health",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
+    source: "WHO",
     publishedDate: "2024",
     summary:
-      "Learn about menstrual health and its importance to women's physical, mental and social wellbeing.",
+      "Learn about menstrual health, the menstrual cycle and factors that can affect menstrual wellbeing.",
     content:
-      "Menstrual health is an important part of sexual and reproductive health. Reliable information, access to appropriate menstrual products, sanitation and healthcare can support women and girls throughout their menstrual years.",
+      "Menstrual health is an important part of overall health. Understanding your cycle can help you recognize your normal patterns and identify changes that may need professional attention.",
     sourceUrl:
-      "https://www.who.int/health-topics/sexual-and-reproductive-health-and-rights",
+      "https://www.who.int/news-room/fact-sheets/detail/menstrual-health",
   },
-
-  // =========================
-  // PREGNANCY
-  // =========================
 
   {
     id: 2,
-    title: "Keeping Well During Pregnancy",
+    title: "Pregnancy and Antenatal Care",
     category: "Pregnancy",
+    categorySlug: "pregnancy",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
-    publishedDate: "2022",
+    source: "WHO",
+    publishedDate: "2024",
     summary:
-      "Explore important health information and care considerations during pregnancy.",
+      "Understand the importance of antenatal care and regular healthcare visits during pregnancy.",
     content:
-      "Pregnancy is an important period for maternal and fetal health. Regular healthcare visits, attention to nutrition, physical activity where appropriate and awareness of warning signs can support a healthy pregnancy.",
+      "Antenatal care supports the health and wellbeing of pregnant women and their babies. Regular contact with qualified healthcare professionals can help monitor pregnancy and identify concerns early.",
     sourceUrl:
-      "https://www.who.int/tools/your-life-your-health/life-phase/pregnancy--birth-and-after-childbirth/keeping-well-during-pregnancy-and-after-childbirth",
+      "https://www.who.int/health-topics/maternal-health",
   },
-
-  // =========================
-  // FERTILITY
-  // =========================
 
   {
     id: 3,
-    title: "Infertility and Fertility Care",
+    title: "Infertility and Fertility Health",
     category: "Fertility",
+    categorySlug: "fertility",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
+    source: "WHO",
     publishedDate: "2024",
     summary:
-      "Learn about infertility, fertility care and reproductive health.",
+      "Learn about infertility, fertility challenges and when professional support may be appropriate.",
     content:
-      "Fertility can be affected by many different factors. Infertility is a medical condition that can affect people and couples, and appropriate evaluation and care from qualified healthcare professionals can help identify possible causes and available options.",
+      "Infertility can affect individuals and couples for many different reasons. Understanding fertility and seeking appropriate medical advice can help people make informed decisions about their health.",
     sourceUrl:
-      "https://www.who.int/health-topics/infertility",
+      "https://www.who.int/news-room/fact-sheets/detail/infertility",
   },
-
-  // =========================
-  // NUTRITION
-  // =========================
 
   {
     id: 4,
-    title: "Healthy Diet",
+    title: "Healthy Diet and Nutrition",
     category: "Nutrition",
+    categorySlug: "nutrition",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
-    publishedDate: "2026",
+    source: "WHO",
+    publishedDate: "2024",
     summary:
-      "Learn the basic principles of a healthy and balanced diet.",
+      "Explore the basics of healthy eating and balanced nutrition.",
     content:
-      "A healthy diet supports wellbeing throughout life. WHO describes adequacy, balance, moderation and diversity as important principles of healthy eating. Individual nutritional needs can vary depending on age, health and other circumstances.",
+      "A healthy diet provides nutrients needed for growth, energy and normal body function. A balanced eating pattern can include a variety of fruits, vegetables, whole grains, proteins and other nutritious foods.",
     sourceUrl:
       "https://www.who.int/news-room/fact-sheets/detail/healthy-diet",
   },
 
-  // =========================
-  // MENTAL WELLBEING
-  // =========================
-
   {
     id: 5,
-    title: "Perinatal Mental Health",
+    title: "Mental Health and Wellbeing",
     category: "Mental Wellbeing",
+    categorySlug: "mental-wellbeing",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
+    source: "WHO",
     publishedDate: "2024",
     summary:
-      "Learn about mental wellbeing during pregnancy and after childbirth.",
+      "Learn about mental health and why emotional wellbeing is an important part of overall health.",
     content:
-      "Mental health is an important part of maternal health. Some women experience mental health conditions during pregnancy or after childbirth. Early identification, appropriate support and professional care can help women receive the assistance they need.",
+      "Mental health is an important part of overall wellbeing. Looking after mental health can involve healthy routines, social connection, rest and seeking professional support when needed.",
     sourceUrl:
-      "https://www.who.int/teams/mental-health-and-substance-use/promotion-prevention/perinatal-mental-health",
+      "https://www.who.int/health-topics/mental-health",
   },
-
-  // =========================
-  // SLEEP
-  // =========================
 
   {
     id: 6,
-    title: "Sleep and Wellbeing",
+    title: "Sleep and Health",
     category: "Sleep",
+    categorySlug: "sleep",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
+    source: "WHO",
     publishedDate: "2024",
     summary:
-      "Explore why healthy sleep is an important part of overall wellbeing.",
+      "Understand why healthy sleep is important for physical and mental wellbeing.",
     content:
-      "Sleep is an important part of maintaining health and wellbeing. Sleep needs can change throughout life, and factors such as stress, lifestyle and health conditions can affect sleep.",
+      "Sleep supports physical health, mental wellbeing and normal daily functioning. Consistent sleep routines and a suitable sleep environment can support healthier sleep habits.",
     sourceUrl:
       "https://www.who.int/health-topics/sleep",
   },
 
-  // =========================
-  // WELLNESS & EXERCISE
-  // =========================
-
   {
     id: 7,
-    title: "Physical Activity and Women's Health",
+    title: "Physical Activity and Health",
     category: "Wellness & Exercise",
+    categorySlug: "wellness-exercise",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
+    source: "WHO",
     publishedDate: "2024",
     summary:
-      "Learn about the health benefits of regular physical activity.",
+      "Learn how regular physical activity can support overall health and wellbeing.",
     content:
-      "Regular physical activity is associated with a range of health benefits. The appropriate type and amount of activity can vary between people, and pregnant or postpartum women should consider guidance from qualified healthcare professionals when special circumstances or complications are present.",
+      "Regular physical activity can benefit physical and mental health. Activities can be adapted to individual abilities, preferences and circumstances.",
     sourceUrl:
       "https://www.who.int/news-room/fact-sheets/detail/physical-activity",
   },
 
-  // =========================
-  // POSTPARTUM
-  // =========================
-
   {
     id: 8,
-    title: "Postnatal Care and Recovery",
+    title: "Postpartum Health",
     category: "Postpartum",
+    categorySlug: "postpartum",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
-    publishedDate: "2022",
+    source: "WHO",
+    publishedDate: "2024",
     summary:
-      "Learn about physical and emotional care during the period after childbirth.",
+      "Learn about the importance of care and support after childbirth.",
     content:
-      "The postnatal period is an important stage of maternal and newborn care. Appropriate care can support physical recovery, mental wellbeing, breastfeeding, family planning and the health of both mother and baby.",
+      "The period after childbirth is an important time for recovery and adjustment. Postpartum care can support both the mother and baby and provide opportunities to identify health concerns.",
     sourceUrl:
-      "https://www.who.int/publications/i/item/9789240045989",
+      "https://www.who.int/health-topics/maternal-health",
   },
 
   {
     id: 9,
-    title: "Postpartum Mental Health",
-    category: "Postpartum",
+    title: "Understanding Menstrual Pain",
+    category: "Menstrual Health",
+    categorySlug: "menstrual-health",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
+    source: "WHO",
     publishedDate: "2024",
     summary:
-      "Understand why mental health support is an important part of care after childbirth.",
+      "Learn about menstrual pain and when symptoms may require medical attention.",
     content:
-      "Mental wellbeing should be considered as part of postnatal care. Some women experience depression or other mental health difficulties after childbirth. Professional support can help with identification, treatment and recovery.",
+      "Some menstrual discomfort can occur during a period. Severe, persistent or unusual pain should be discussed with a qualified healthcare professional because it can sometimes be associated with an underlying condition.",
     sourceUrl:
-      "https://www.who.int/teams/mental-health-and-substance-use/promotion-prevention/perinatal-mental-health",
+      "https://www.who.int/news-room/fact-sheets/detail/menstrual-health",
   },
-
-  // =========================
-  // PREGNANCY - DEEPER TOPIC
-  // =========================
 
   {
     id: 10,
     title: "Nutrition During Pregnancy",
     category: "Pregnancy",
+    categorySlug: "pregnancy",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
-    publishedDate: "2023",
+    source: "WHO",
+    publishedDate: "2024",
     summary:
-      "Learn about nutrition counselling and healthy eating during pregnancy.",
+      "Understand the importance of appropriate nutrition during pregnancy.",
     content:
-      "Good nutrition during pregnancy supports the health of the mother and unborn child. WHO recommends nutrition counselling during pregnancy, with attention to a varied and balanced diet and appropriate nutritional support.",
+      "Good nutrition during pregnancy supports the health of the mother and developing baby. Individual nutritional needs can vary, so pregnancy nutrition should be discussed with a qualified healthcare professional.",
     sourceUrl:
-      "https://www.who.int/tools/elena/interventions/nutrition-counselling-pregnancy",
+      "https://www.who.int/health-topics/maternal-health",
   },
-
-  // =========================
-  // PREGNANCY & POSTPARTUM EXERCISE
-  // =========================
 
   {
     id: 11,
-    title: "Physical Activity During Pregnancy and After Childbirth",
+    title: "Healthy Lifestyle and Everyday Wellness",
     category: "Wellness & Exercise",
+    categorySlug: "wellness-exercise",
     type: "Medical Article",
     author: "World Health Organization",
-    source: "World Health Organization (WHO)",
-    publishedDate: "2020",
+    source: "WHO",
+    publishedDate: "2024",
     summary:
-      "Learn about physical activity recommendations for pregnant and postpartum women.",
+      "Explore everyday habits that can contribute to general health and wellbeing.",
     content:
-      "Physical activity can provide health benefits during pregnancy and after childbirth when appropriate. Women with pregnancy or delivery complications should seek guidance from a qualified healthcare professional about suitable activity.",
+      "Healthy living can involve regular movement, nutritious food, sufficient rest, social connection and appropriate healthcare. Small sustainable habits can contribute to overall wellbeing.",
     sourceUrl:
-      "https://www.who.int/publications/i/item/9789240015128",
+      "https://www.who.int/health-topics/physical-activity",
   },
 ];

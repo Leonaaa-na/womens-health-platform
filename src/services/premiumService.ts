@@ -1,4 +1,4 @@
-import apiClient, { ApiErrorResponse } from "../api/client";
+import apiClient from "../api/client";
 
 export interface PremiumStatus {
   isPremium: boolean;
@@ -54,58 +54,117 @@ const defaultStatus: PremiumStatus = {
   daysLeft: 0,
 };
 
-export const getPremiumStatus = async (): Promise<PremiumStatus> => {
-  try {
-    const response = await apiClient.get<{
-      subscription: { endDate: string | null; plan: string } | null;
-      isPremium: boolean;
-      daysLeft: number;
-      plan: string;
-    }>("/payments/subscription");
+/*
+ * GET PREMIUM STATUS
+ */
+export const getPremiumStatus =
+  async (): Promise<PremiumStatus> => {
+    try {
+      const response =
+        await apiClient.get<{
+          subscription: {
+            endDate: string | null;
+            plan: string;
+          } | null;
+          isPremium: boolean;
+          daysLeft: number;
+          plan: string;
+        }>("/payments/subscription");
 
-    const data = response.data.data;
-    return {
-      isPremium: data.isPremium,
-      plan: data.plan as "free" | "monthly" | "yearly",
-      expiresAt: data.subscription?.endDate || null,
-      daysLeft: data.daysLeft,
-    };
-  } catch {
-    return defaultStatus;
-  }
-};
+      const data = response.data;
 
-export const getPlans = async (): Promise<{ plans: PremiumPlan[]; features: string[] }> => {
-  try {
-    const response = await apiClient.get<PlansResponse>("/payments/plans");
-    return response.data.data;
-  } catch {
-    return { plans: [], features: [] };
-  }
-};
+      return {
+        isPremium: Boolean(data.isPremium),
 
-export const initializePayment = async (plan: string): Promise<PaymentInitResponse> => {
-  const response = await apiClient.post<PaymentInitResponse>("/payments/initialize", {
-    purpose: "subscription",
-    plan,
-  });
-  return response.data.data;
-};
+        plan:
+          data.plan === "monthly" ||
+          data.plan === "yearly"
+            ? data.plan
+            : "free",
 
-export const verifyPayment = async (reference: string): Promise<PaymentVerifyResponse> => {
-  const response = await apiClient.get<PaymentVerifyResponse>(`/payments/verify/${encodeURIComponent(reference)}`);
-  return response.data.data;
-};
+        expiresAt:
+          data.subscription?.endDate || null,
 
-export const cancelSubscription = async () => {
-  const response = await apiClient.put("/payments/subscription/cancel");
+        daysLeft: Number(data.daysLeft) || 0,
+      };
+    } catch {
+      return defaultStatus;
+    }
+  };
+
+/*
+ * GET PREMIUM PLANS
+ */
+export const getPlans =
+  async (): Promise<PlansResponse> => {
+    try {
+      const response =
+        await apiClient.get<PlansResponse>(
+          "/payments/plans"
+        );
+
+      return response.data;
+    } catch {
+      return {
+        plans: [],
+        features: [],
+      };
+    }
+  };
+
+/*
+ * INITIALIZE PAYMENT
+ */
+export const initializePayment = async (
+  plan: string
+): Promise<PaymentInitResponse> => {
+  const response =
+    await apiClient.post<PaymentInitResponse>(
+      "/payments/initialize",
+      {
+        purpose: "subscription",
+        plan,
+      }
+    );
+
   return response.data;
 };
 
+/*
+ * VERIFY PAYMENT
+ */
+export const verifyPayment = async (
+  reference: string
+): Promise<PaymentVerifyResponse> => {
+  const response =
+    await apiClient.get<PaymentVerifyResponse>(
+      `/payments/verify/${encodeURIComponent(
+        reference
+      )}`
+    );
+
+  return response.data;
+};
+
+/*
+ * CANCEL SUBSCRIPTION
+ */
+export const cancelSubscription = async () => {
+  const response =
+    await apiClient.put(
+      "/payments/subscription/cancel"
+    );
+
+  return response.data;
+};
+
+/*
+ * BACKWARD COMPATIBILITY
+ */
 export const clearPremiumStatus = (): void => {
-  // No-op — premium status is now server-side
+  // Premium status is now managed by the backend.
 };
 
 export const activatePremiumForTesting = (): void => {
-  // No-op — kept for backward compatibility
+  // Kept for backward compatibility.
 };

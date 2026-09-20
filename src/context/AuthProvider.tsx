@@ -1,10 +1,6 @@
 import {
-  createContext,
   useCallback,
-  useContext,
-  useEffect,
   useState,
-  type ReactNode,
 } from "react";
 
 import {
@@ -16,79 +12,21 @@ import {
 
 import apiClient from "../api/client";
 
-export interface PremiumStatus {
-  isPremium: boolean;
-  plan: "free" | "monthly" | "yearly";
-  expiresAt: string | null;
-  daysLeft: number;
-}
+import {
+  AuthContext,
+  DEFAULT_PREMIUM_STATUS,
+  type AuthProviderProps,
+  type PremiumStatus,
+} from "./AuthContext";
 
-export interface AuthContextType {
-  user: User | null;
-  isAuthenticated: boolean;
-  authLoading: boolean;
-
-  loading: boolean;
-  isError: boolean;
-  errMessage: string;
-  isSuccess: boolean;
-  successMessage: string;
-
-  premiumStatus: PremiumStatus;
-  premiumLoading: boolean;
-
-  refreshPremium: () => Promise<void>;
-
-  login: (
-    email: string,
-    password: string
-  ) => Promise<boolean>;
-
-  signUp: (
-    firstName: string,
-    lastName: string,
-    email: string,
-    password: string,
-    acceptTerms: boolean,
-    healthDataConsent: boolean
-  ) => Promise<boolean>;
-
-  logout: () => void;
-}
-
-export const DEFAULT_PREMIUM_STATUS: PremiumStatus = {
-  isPremium: false,
-  plan: "free",
-  expiresAt: null,
-  daysLeft: 0,
-};
-
-export const AuthContext =
-  createContext<AuthContextType | undefined>(
-    undefined
-  );
-
-export interface AuthProviderProps {
-  children: ReactNode;
-}
-
-/*
- * Shape returned by
- * GET /api/payments/subscription
- */
-interface SubscriptionData {
-  subscription: {
-    endDate: string | null;
-    plan: string;
-  } | null;
-  isPremium: boolean;
-  daysLeft: number;
-  plan: string;
-}
-
-const clearAuth = () => {
+const clearAuthStorage = () => {
   localStorage.removeItem("herbloomUser");
-  localStorage.removeItem("herbloomAccessToken");
+  localStorage.removeItem(
+    "herbloomAccessToken"
+  );
+  localStorage.removeItem(
+    "herbloomRefreshToken"
+  );
 };
 
 const getSavedUser = (): User | null => {
@@ -107,7 +45,7 @@ const getSavedUser = (): User | null => {
   try {
     return JSON.parse(savedUser) as User;
   } catch {
-    clearAuth();
+    clearAuthStorage();
     return null;
   }
 };
@@ -115,11 +53,13 @@ const getSavedUser = (): User | null => {
 export function AuthProvider({
   children,
 }: AuthProviderProps) {
-  const [user, setUser] =
-    useState<User | null>(getSavedUser);
-
-  const [authLoading, setAuthLoading] =
-    useState(true);
+  /*
+   * Restore saved authentication immediately.
+   * No useEffect is needed here.
+   */
+  const [user, setUser] = useState<User | null>(
+    getSavedUser
+  );
 
   const [loading, setLoading] =
     useState(false);
@@ -145,21 +85,16 @@ export function AuthProvider({
     useState(false);
 
   /*
-   * PREMIUM STATUS
+   * PREMIUM
    */
   const refreshPremium = useCallback(
     async () => {
-      const savedUser =
-        localStorage.getItem(
-          "herbloomUser"
-        );
-
       const accessToken =
         localStorage.getItem(
           "herbloomAccessToken"
         );
 
-      if (!savedUser || !accessToken) {
+      if (!accessToken) {
         setPremiumStatus(
           DEFAULT_PREMIUM_STATUS
         );
@@ -169,17 +104,25 @@ export function AuthProvider({
       setPremiumLoading(true);
 
       try {
-        /*
-         * The backend wraps everything in
-         * { success, message, data }, so the
-         * values live at response.data.data
-         */
-        const response = await apiClient.get(
-          "/payments/subscription"
-        );
+        const response =
+          await apiClient.get<{
+            success?: boolean;
+            data?: {
+              subscription?: {
+                endDate: string | null;
+                plan: string;
+              } | null;
 
-        const data: SubscriptionData | undefined =
-          response.data?.data;
+              isPremium: boolean;
+              daysLeft: number;
+              plan: string;
+            };
+          }>(
+            "/payment/subscription"
+          );
+
+        const data =
+          response.data.data;
 
         if (!data) {
           setPremiumStatus(
@@ -198,14 +141,21 @@ export function AuthProvider({
           isPremium: Boolean(
             data.isPremium
           ),
+
           plan,
+
           expiresAt:
-            data.subscription?.endDate ||
-            null,
+            data.subscription
+              ?.endDate || null,
+
           daysLeft:
             Number(data.daysLeft) || 0,
         });
       } catch {
+        /*
+         * If the backend is not connected yet,
+         * keep the frontend usable.
+         */
         setPremiumStatus(
           DEFAULT_PREMIUM_STATUS
         );
@@ -215,61 +165,6 @@ export function AuthProvider({
     },
     []
   );
-
-  /*
-   * LOGOUT
-   */
-  const logout = useCallback(() => {
-    setUser(null);
-
-    setPremiumStatus(
-      DEFAULT_PREMIUM_STATUS
-    );
-
-    clearAuth();
-
-    window.dispatchEvent(
-      new CustomEvent("auth:logout")
-    );
-  }, []);
-
-  /*
-   * ON APP START
-   *
-   * A saved user means we are still logged in,
-   * so fetch the premium status again. Also
-   * listen for the logout event that client.ts
-   * fires when the token has expired.
-   */
-  useEffect(() => {
-    const startUp = async () => {
-      if (getSavedUser()) {
-        await refreshPremium();
-      }
-      setAuthLoading(false);
-    };
-
-    startUp();
-
-    const handleForcedLogout = () => {
-      setUser(null);
-      setPremiumStatus(
-        DEFAULT_PREMIUM_STATUS
-      );
-    };
-
-    window.addEventListener(
-      "auth:logout",
-      handleForcedLogout
-    );
-
-    return () => {
-      window.removeEventListener(
-        "auth:logout",
-        handleForcedLogout
-      );
-    };
-  }, [refreshPremium]);
 
   /*
    * LOGIN
@@ -302,6 +197,9 @@ export function AuthProvider({
           const accessToken =
             response.data.accessToken;
 
+          const refreshToken =
+            response.data.refreshToken;
+
           setUser(loggedInUser);
 
           localStorage.setItem(
@@ -316,6 +214,13 @@ export function AuthProvider({
             accessToken
           );
 
+          if (refreshToken) {
+            localStorage.setItem(
+              "herbloomRefreshToken",
+              refreshToken
+            );
+          }
+
           setIsSuccess(true);
 
           setSuccessMessage(
@@ -323,6 +228,10 @@ export function AuthProvider({
               "Login successful."
           );
 
+          /*
+           * Premium information is loaded
+           * after authentication.
+           */
           await refreshPremium();
 
           return true;
@@ -392,6 +301,9 @@ export function AuthProvider({
           const accessToken =
             response.data.accessToken;
 
+          const refreshToken =
+            response.data.refreshToken;
+
           setUser(createdUser);
 
           localStorage.setItem(
@@ -405,6 +317,13 @@ export function AuthProvider({
             "herbloomAccessToken",
             accessToken
           );
+
+          if (refreshToken) {
+            localStorage.setItem(
+              "herbloomRefreshToken",
+              refreshToken
+            );
+          }
 
           setIsSuccess(true);
 
@@ -443,10 +362,34 @@ export function AuthProvider({
     [refreshPremium]
   );
 
-  const value: AuthContextType = {
+  /*
+   * LOGOUT
+   */
+  const logout = useCallback(() => {
+    setUser(null);
+
+    setPremiumStatus(
+      DEFAULT_PREMIUM_STATUS
+    );
+
+    clearAuthStorage();
+
+    window.dispatchEvent(
+      new CustomEvent("auth:logout")
+    );
+  }, []);
+
+  const value = {
     user,
-    isAuthenticated: Boolean(user),
-    authLoading,
+
+    isAuthenticated:
+      Boolean(user),
+
+    /*
+     * Authentication has already been
+     * restored synchronously from storage.
+     */
+    authLoading: false,
 
     loading,
     isError,
@@ -465,21 +408,10 @@ export function AuthProvider({
   };
 
   return (
-    <AuthContext.Provider value={value}>
+    <AuthContext.Provider
+      value={value}
+    >
       {children}
     </AuthContext.Provider>
   );
-}
-
-export function useAuth(): AuthContextType {
-  const context =
-    useContext(AuthContext);
-
-  if (!context) {
-    throw new Error(
-      "useAuth must be used inside an AuthProvider"
-    );
-  }
-
-  return context;
 }

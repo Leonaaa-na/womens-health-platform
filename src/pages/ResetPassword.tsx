@@ -1,9 +1,6 @@
-import { useState, type FormEvent } from "react";
+import { useState } from "react";
 import { useNavigate, useSearchParams } from "react-router-dom";
-import {
-  apiClient,
-  type ApiErrorResponse,
-} from "../api/client";
+import apiClient from "../api/client";
 
 function ResetPassword() {
   const navigate = useNavigate();
@@ -12,21 +9,21 @@ function ResetPassword() {
   const [email, setEmail] = useState(
     searchParams.get("email") || ""
   );
+
   const [code, setCode] = useState("");
   const [newPassword, setNewPassword] = useState("");
-  const [confirmPassword, setConfirmPassword] =
-    useState("");
+  const [confirmPassword, setConfirmPassword] = useState("");
 
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(
-    null
-  );
+  const [error, setError] = useState("");
   const [success, setSuccess] = useState(false);
 
   const handleSubmit = async (
-    event: FormEvent<HTMLFormElement>
+    event: React.FormEvent
   ) => {
     event.preventDefault();
+
+    setError("");
 
     if (!email.trim()) {
       setError("Please enter your email address.");
@@ -38,8 +35,20 @@ function ResetPassword() {
       return;
     }
 
+    if (code.length !== 6) {
+      setError("The reset code must be 6 digits.");
+      return;
+    }
+
     if (!newPassword) {
-      setError("Please enter your new password.");
+      setError("Please enter a new password.");
+      return;
+    }
+
+    if (newPassword.length < 6) {
+      setError(
+        "Your new password must be at least 6 characters."
+      );
       return;
     }
 
@@ -48,15 +57,7 @@ function ResetPassword() {
       return;
     }
 
-    if (newPassword.length < 6) {
-      setError(
-        "Password must be at least 6 characters long."
-      );
-      return;
-    }
-
     setLoading(true);
-    setError(null);
 
     try {
       await apiClient.post("/users/reset-password", {
@@ -66,15 +67,17 @@ function ResetPassword() {
       });
 
       setSuccess(true);
-    } catch (err: unknown) {
-      const apiError = err as {
+    } catch (error: unknown) {
+      const apiError = error as {
         response?: {
-          data?: ApiErrorResponse;
+          data?: {
+            message?: string;
+          };
         };
       };
 
       setError(
-        apiError?.response?.data?.message ||
+        apiError.response?.data?.message ||
           "Unable to reset password. Please try again."
       );
     } finally {
@@ -86,8 +89,11 @@ function ResetPassword() {
     return (
       <div className="flex min-h-screen items-center justify-center bg-gray-50 px-4">
         <div className="w-full max-w-md rounded-2xl bg-white p-8 text-center shadow-lg">
+
           <div className="mx-auto mb-4 flex h-14 w-14 items-center justify-center rounded-full bg-green-100">
-            <span className="text-2xl">✓</span>
+            <span className="text-2xl text-green-600">
+              ✓
+            </span>
           </div>
 
           <h2 className="text-xl font-bold text-gray-900">
@@ -111,8 +117,9 @@ function ResetPassword() {
   }
 
   return (
-    <div className="flex min-h-screen items-center justify-center bg-pink-50 px-4">
+    <div className="flex min-h-screen items-center justify-center bg-pink-50 px-4 py-10">
       <div className="w-full max-w-md rounded-2xl bg-white p-8 shadow-lg">
+
         {/* Icon */}
         <div className="mb-5 flex justify-center">
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-pink-100">
@@ -135,11 +142,12 @@ function ResetPassword() {
           onSubmit={handleSubmit}
           className="space-y-5"
         >
+
           {/* Error */}
           {error && (
-            <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+            <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
               {error}
-            </p>
+            </div>
           )}
 
           {/* Email */}
@@ -152,8 +160,8 @@ function ResetPassword() {
             </label>
 
             <input
-              type="email"
               id="reset-email"
+              type="email"
               value={email}
               onChange={(event) =>
                 setEmail(event.target.value)
@@ -161,7 +169,7 @@ function ResetPassword() {
               placeholder="Enter your email"
               required
               disabled={loading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400 disabled:cursor-wait disabled:opacity-60"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 disabled:cursor-wait disabled:opacity-60"
             />
           </div>
 
@@ -175,19 +183,23 @@ function ResetPassword() {
             </label>
 
             <input
-              type="text"
               id="reset-code"
+              type="text"
               inputMode="numeric"
-              pattern="[0-9]{6}"
               maxLength={6}
+              pattern="[0-9]{6}"
               value={code}
-              onChange={(event) =>
-                setCode(event.target.value)
-              }
+              onChange={(event) => {
+                const value = event.target.value
+                  .replace(/\D/g, "")
+                  .slice(0, 6);
+
+                setCode(value);
+              }}
               placeholder="Enter the code from your email"
               required
               disabled={loading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400 disabled:cursor-wait disabled:opacity-60"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 disabled:cursor-wait disabled:opacity-60"
             />
           </div>
 
@@ -201,8 +213,8 @@ function ResetPassword() {
             </label>
 
             <input
-              type="password"
               id="new-password"
+              type="password"
               value={newPassword}
               onChange={(event) =>
                 setNewPassword(event.target.value)
@@ -211,7 +223,7 @@ function ResetPassword() {
               required
               minLength={6}
               disabled={loading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400 disabled:cursor-wait disabled:opacity-60"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 disabled:cursor-wait disabled:opacity-60"
             />
           </div>
 
@@ -225,8 +237,8 @@ function ResetPassword() {
             </label>
 
             <input
-              type="password"
               id="confirm-password"
+              type="password"
               value={confirmPassword}
               onChange={(event) =>
                 setConfirmPassword(event.target.value)
@@ -235,7 +247,7 @@ function ResetPassword() {
               required
               minLength={6}
               disabled={loading}
-              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-400 disabled:cursor-wait disabled:opacity-60"
+              className="w-full rounded-lg border border-gray-300 px-4 py-3 outline-none focus:border-pink-400 focus:ring-2 focus:ring-pink-100 disabled:cursor-wait disabled:opacity-60"
             />
           </div>
 
@@ -251,7 +263,7 @@ function ResetPassword() {
           </button>
         </form>
 
-        {/* Bottom text */}
+        {/* Login */}
         <p className="mt-6 text-center text-sm text-gray-500">
           Remember your password?{" "}
           <button

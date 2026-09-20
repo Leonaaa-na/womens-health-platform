@@ -1,17 +1,15 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiClient, type ApiErrorResponse } from "../api/client";
+import apiClient from "../api/client";
 
 function ForgotPassword() {
   const navigate = useNavigate();
 
   const [email, setEmail] = useState("");
   const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<string | null>(null);
+  const [error, setError] = useState("");
 
-  const handleSubmit = async (
-    event: React.FormEvent<HTMLFormElement>
-  ) => {
+  const handleSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
 
     if (!email.trim()) {
@@ -20,30 +18,29 @@ function ForgotPassword() {
     }
 
     setLoading(true);
-    setError(null);
+    setError("");
 
     try {
-      await apiClient.post<{ message?: string }>(
-        "/users/forgot-password",
-        {
-          email: email.trim(),
-        }
-      );
+      await apiClient.post("/users/forgot-password", {
+        email: email.trim(),
+      });
 
       navigate(
         `/reset-password?email=${encodeURIComponent(
           email.trim()
         )}`
       );
-    } catch (err: unknown) {
-      const apiError = err as {
+    } catch (error: unknown) {
+      const apiError = error as {
         response?: {
-          data?: ApiErrorResponse;
+          data?: {
+            message?: string;
+          };
         };
       };
 
       setError(
-        apiError?.response?.data?.message ||
+        apiError.response?.data?.message ||
           "Something went wrong. Please try again."
       );
     } finally {
@@ -54,6 +51,7 @@ function ForgotPassword() {
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-16">
       <div className="mx-auto max-w-md">
+
         {/* Heading */}
         <div className="mb-8 text-center">
           <div className="mx-auto mb-5 flex h-16 w-16 items-center justify-center rounded-full bg-pink-100">
@@ -76,11 +74,12 @@ function ForgotPassword() {
             onSubmit={handleSubmit}
             className="space-y-6"
           >
+
             {/* Error */}
             {error && (
-              <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
+              <div className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
-              </p>
+              </div>
             )}
 
             {/* Email */}
@@ -93,8 +92,8 @@ function ForgotPassword() {
               </label>
 
               <input
-                type="email"
                 id="email"
+                type="email"
                 value={email}
                 onChange={(event) =>
                   setEmail(event.target.value)
