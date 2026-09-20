@@ -15,6 +15,7 @@ function Login() {
 
   const [email, setEmail] = useState("");
   const [password, setPassword] = useState("");
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleLogin = async (
     event: React.FormEvent
@@ -79,16 +80,33 @@ function Login() {
             />
 
             {/* Password */}
-            <FormInput
-              label="Password"
-              type="password"
-              name="password"
-              placeholder="Enter your password"
-              value={password}
-              onChange={(event) =>
-                setPassword(event.target.value)
-              }
-            />
+            <div className="relative">
+              <FormInput
+                label="Password"
+                type={showPassword ? "text" : "password"}
+                name="password"
+                placeholder="Enter your password"
+                value={password}
+                onChange={(event) =>
+                  setPassword(event.target.value)
+                }
+              />
+
+              <button
+                type="button"
+                onClick={() =>
+                  setShowPassword((current) => !current)
+                }
+                className="absolute right-3 top-[38px] rounded-md px-2 py-1 text-sm text-gray-500 transition hover:bg-gray-100 hover:text-gray-700"
+                aria-label={
+                  showPassword
+                    ? "Hide password"
+                    : "Show password"
+                }
+              >
+                {showPassword ? "🙈" : "👁️"}
+              </button>
+            </div>
 
             {/* Error Message */}
             {isError && (

@@ -1,6 +1,6 @@
 import { useState } from "react";
 import { useNavigate } from "react-router-dom";
-import { apiClient, ApiErrorResponse } from "../../api/client";
+import { apiClient, type ApiErrorResponse } from "../api/client";
 
 function ForgotPassword() {
   const navigate = useNavigate();
@@ -9,9 +9,15 @@ function ForgotPassword() {
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
-  const handleSubmit = async (event: React.FormEvent) => {
+  const handleSubmit = async (
+    event: React.FormEvent<HTMLFormElement>
+  ) => {
     event.preventDefault();
-    if (!email) return;
+
+    if (!email.trim()) {
+      setError("Please enter your email address.");
+      return;
+    }
 
     setLoading(true);
     setError(null);
@@ -19,11 +25,23 @@ function ForgotPassword() {
     try {
       await apiClient.post<{ message?: string }>(
         "/users/forgot-password",
-        { email }
+        {
+          email: email.trim(),
+        }
       );
-      navigate(`/reset-password?email=${encodeURIComponent(email)}`);
+
+      navigate(
+        `/reset-password?email=${encodeURIComponent(
+          email.trim()
+        )}`
+      );
     } catch (err: unknown) {
-      const apiError = err as { response?: { data?: ApiErrorResponse } };
+      const apiError = err as {
+        response?: {
+          data?: ApiErrorResponse;
+        };
+      };
+
       setError(
         apiError?.response?.data?.message ||
           "Something went wrong. Please try again."
@@ -54,7 +72,11 @@ function ForgotPassword() {
 
         {/* Card */}
         <div className="rounded-2xl bg-white p-8 shadow-md">
-          <form onSubmit={handleSubmit} className="space-y-6">
+          <form
+            onSubmit={handleSubmit}
+            className="space-y-6"
+          >
+            {/* Error */}
             {error && (
               <p className="rounded-lg bg-red-50 px-4 py-3 text-sm text-red-600">
                 {error}
@@ -74,7 +96,9 @@ function ForgotPassword() {
                 type="email"
                 id="email"
                 value={email}
-                onChange={(event) => setEmail(event.target.value)}
+                onChange={(event) =>
+                  setEmail(event.target.value)
+                }
                 placeholder="Enter your email"
                 required
                 disabled={loading}
@@ -88,7 +112,9 @@ function ForgotPassword() {
               disabled={loading}
               className="w-full rounded-lg bg-pink-600 py-3 font-semibold text-white transition hover:bg-pink-700 disabled:cursor-wait disabled:opacity-70"
             >
-              {loading ? "Sending Reset Link..." : "Send Reset Link"}
+              {loading
+                ? "Sending Reset Link..."
+                : "Send Reset Link"}
             </button>
           </form>
 

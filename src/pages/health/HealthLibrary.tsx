@@ -1,63 +1,102 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { Link, useNavigate } from "react-router-dom";
-import apiClient from "../api/client";
 
 interface Category {
   id: string;
   name: string;
   slug: string;
-  description: string | null;
-  icon: string | null;
+  description: string;
+  icon: string;
 }
 
-const FALLBACK_CATEGORIES: Category[] = [
-  { id: "fallback-1", name: "Menstrual Health", slug: "menstrual-health", description: "Cycles, periods, symptoms and reproductive health.", icon: "🩸" },
-  { id: "fallback-2", name: "Pregnancy", slug: "pregnancy", description: "Pregnancy changes, care, warning signs and what to expect.", icon: "🤰🏾" },
-  { id: "fallback-3", name: "Fertility", slug: "fertility", description: "Fertility, conception and reproductive planning.", icon: "🌱" },
-  { id: "fallback-4", name: "Nutrition", slug: "nutrition", description: "Healthy eating and nutrition for women's health.", icon: "🥗" },
-  { id: "fallback-5", name: "Mental Wellbeing", slug: "mental-wellbeing", description: "Mental health during everyday life, pregnancy and beyond.", icon: "🧠" },
-  { id: "fallback-6", name: "Sleep", slug: "sleep", description: "Sleep, rest and healthy routines.", icon: "🌙" },
-  { id: "fallback-7", name: "Wellness & Exercise", slug: "wellness-exercise", description: "Movement, wellness and healthy lifestyle information.", icon: "🏃🏾‍♀️" },
-  { id: "fallback-8", name: "Postpartum", slug: "postpartum", description: "Recovery, postnatal care and life after pregnancy.", icon: "👶🏾" },
+const CATEGORIES: Category[] = [
+  {
+    id: "1",
+    name: "Menstrual Health",
+    slug: "menstrual-health",
+    description:
+      "Cycles, periods, symptoms, cramps and reproductive health.",
+    icon: "🩸",
+  },
+  {
+    id: "2",
+    name: "Pregnancy",
+    slug: "pregnancy",
+    description:
+      "Pregnancy changes, care, warning signs and what to expect.",
+    icon: "🤰🏾",
+  },
+  {
+    id: "3",
+    name: "Fertility",
+    slug: "fertility",
+    description:
+      "Fertility, conception and reproductive planning.",
+    icon: "🌱",
+  },
+  {
+    id: "4",
+    name: "Nutrition",
+    slug: "nutrition",
+    description:
+      "Healthy eating and nutrition for women's health.",
+    icon: "🥗",
+  },
+  {
+    id: "5",
+    name: "Mental Wellbeing",
+    slug: "mental-wellbeing",
+    description:
+      "Mental health, emotional wellbeing and everyday life.",
+    icon: "🧠",
+  },
+  {
+    id: "6",
+    name: "Sleep",
+    slug: "sleep",
+    description:
+      "Sleep, rest and healthy routines for better wellbeing.",
+    icon: "🌙",
+  },
+  {
+    id: "7",
+    name: "Wellness & Exercise",
+    slug: "wellness-exercise",
+    description:
+      "Movement, wellness and healthy lifestyle information.",
+    icon: "🏃🏾‍♀️",
+  },
+  {
+    id: "8",
+    name: "Postpartum",
+    slug: "postpartum",
+    description:
+      "Recovery, postnatal care and life after pregnancy.",
+    icon: "👶🏾",
+  },
 ];
 
 function HealthLibrary() {
   const navigate = useNavigate();
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [loading, setLoading] = useState(true);
-
   const [searchTerm, setSearchTerm] = useState("");
-
-  useEffect(() => {
-    const loadCategories = async () => {
-      setLoading(true);
-      try {
-        const response = await apiClient.get<Category[]>("/library/categories");
-        const fetched = response.data.success ? response.data.data || [] : [];
-        setCategories(fetched.length ? fetched : FALLBACK_CATEGORIES);
-      } catch {
-        setCategories(FALLBACK_CATEGORIES);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    loadCategories();
-  }, []);
 
   const handleSearch = () => {
     const search = searchTerm.trim();
-    navigate(
-      search
-        ? `/health-library/search?q=${encodeURIComponent(search)}`
-        : "/health-library/search"
-    );
+
+    if (search) {
+      navigate(
+        `/health-library/search?q=${encodeURIComponent(search)}`
+      );
+    } else {
+      navigate("/health-library/search");
+    }
   };
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="mx-auto max-w-7xl">
+
         {/* Header */}
         <div className="mb-10">
           <p className="mb-2 text-sm font-semibold uppercase tracking-wide text-pink-600">
@@ -111,22 +150,25 @@ function HealthLibrary() {
           </div>
         </div>
 
-        {/* Featured Sections */}
+        {/* Main Sections */}
         <div className="mb-10 grid gap-6 md:grid-cols-3">
+
           {/* Browse Articles */}
           <Link
             to="/health-library/articles"
             className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
           >
-            <div className="mb-4 text-3xl">📖</div>
+            <div className="mb-4 text-3xl">
+              📖
+            </div>
 
             <h2 className="text-xl font-bold text-gray-900">
               Browse Articles
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-gray-600">
-              Explore health articles from reliable,
-              verifiable medical sources.
+              Explore health articles from reliable
+              and verifiable medical sources.
             </p>
 
             <span className="mt-4 inline-block font-semibold text-pink-600">
@@ -139,7 +181,9 @@ function HealthLibrary() {
             to="/health-library/saved"
             className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
           >
-            <div className="mb-4 text-3xl">❤️</div>
+            <div className="mb-4 text-3xl">
+              ❤️
+            </div>
 
             <h2 className="text-xl font-bold text-gray-900">
               Saved Articles
@@ -157,15 +201,17 @@ function HealthLibrary() {
 
           {/* Trusted Information */}
           <div className="rounded-2xl bg-pink-600 p-6 text-white shadow-sm">
-            <div className="mb-4 text-3xl">🔎</div>
+            <div className="mb-4 text-3xl">
+              🔎
+            </div>
 
             <h2 className="text-xl font-bold">
               Trusted Information
             </h2>
 
             <p className="mt-2 text-sm leading-6 text-pink-50">
-              Medical information will be connected to
-              its original, verifiable source.
+              Health information will identify its
+              original and verifiable source.
             </p>
           </div>
         </div>
@@ -178,41 +224,38 @@ function HealthLibrary() {
             </h2>
 
             <p className="mt-1 text-gray-600">
-              Find information based on what you want
-              to learn about.
+              Find information based on what you
+              want to learn about.
             </p>
           </div>
 
-          {loading ? (
-            <div className="text-center py-8">
-              <div className="mx-auto h-8 w-8 animate-spin rounded-full border-4 border-pink-200 border-t-pink-600"></div>
-              <p className="mt-3 text-sm text-gray-500">Loading categories...</p>
-            </div>
-          ) : (
-            <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
-              {categories.map((category) => (
-                <Link
-                  key={category.id}
-                  to={`/health-library/articles?category=${encodeURIComponent(category.slug)}`}
-                  className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
-                >
-                  <div className="mb-4 text-3xl">{category.icon || "📚"}</div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-4">
+            {CATEGORIES.map((category) => (
+              <Link
+                key={category.id}
+                to={`/health-library/articles?category=${encodeURIComponent(
+                  category.slug
+                )}`}
+                className="rounded-2xl bg-white p-6 shadow-sm transition hover:-translate-y-1 hover:shadow-md"
+              >
+                <div className="mb-4 text-3xl">
+                  {category.icon}
+                </div>
 
-                  <h3 className="text-lg font-bold text-gray-900">
-                    {category.name}
-                  </h3>
+                <h3 className="text-lg font-bold text-gray-900">
+                  {category.name}
+                </h3>
 
-                  <p className="mt-2 text-sm leading-6 text-gray-600">
-                    {category.description || "Reliable women's health information."}
-                  </p>
+                <p className="mt-2 text-sm leading-6 text-gray-600">
+                  {category.description}
+                </p>
 
-                  <span className="mt-4 inline-block text-sm font-semibold text-pink-600">
-                    Explore →
-                  </span>
-                </Link>
-              ))}
-            </div>
-          )}
+                <span className="mt-4 inline-block text-sm font-semibold text-pink-600">
+                  Explore →
+                </span>
+              </Link>
+            ))}
+          </div>
         </div>
 
         {/* Important Note */}
@@ -222,14 +265,16 @@ function HealthLibrary() {
           </h2>
 
           <p className="mt-2 text-sm leading-6 text-gray-600">
-            HerBloom's Health Library is designed to help
-            you learn and prepare for conversations with
-            healthcare professionals. Medical articles will
-            identify their original sources, and personal
-            experiences will be clearly labelled as personal
-            stories rather than medical advice.
+            HerBloom's Health Library is designed to
+            help you learn and prepare for conversations
+            with healthcare professionals. Medical
+            articles will identify their original
+            sources, and personal experiences will be
+            clearly labelled as personal stories rather
+            than medical advice.
           </p>
         </div>
+
       </div>
     </div>
   );
