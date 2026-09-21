@@ -28,7 +28,7 @@ export const getIconForType = (type: string): string => typeLabelMap[type] || "ð
 
 export const fetchReminders = async (params?: Record<string, string>): Promise<HerBloomReminder[]> => {
   const response = await apiClient.get<HerBloomReminder[]>("/reminders", { params });
-  return response.data.data;
+  return response.data;
 };
 
 export const fetchUpcomingReminders = async (): Promise<HerBloomReminder[]> => {
@@ -44,17 +44,17 @@ export const createReminder = async (data: {
   repeat?: RepeatType;
 }): Promise<HerBloomReminder> => {
   const response = await apiClient.post<HerBloomReminder>("/reminders", data);
-  return response.data.data;
+  return response.data;
 };
 
 export const updateReminder = async (id: string, data: Partial<HerBloomReminder>): Promise<HerBloomReminder> => {
   const response = await apiClient.put<HerBloomReminder>(`/reminders/${id}`, data);
-  return response.data.data;
+  return response.data;
 };
 
 export const toggleReminderComplete = async (id: string): Promise<HerBloomReminder> => {
   const response = await apiClient.put<HerBloomReminder>(`/reminders/${id}/complete`);
-  return response.data.data;
+  return response.data;
 };
 
 export const deleteReminder = async (id: string): Promise<void> => {
@@ -63,7 +63,7 @@ export const deleteReminder = async (id: string): Promise<void> => {
 
 export const syncAutomaticReminders = async (): Promise<HerBloomReminder[]> => {
   const response = await apiClient.post("/reminders/sync");
-  return (response.data.data as HerBloomReminder[]) || [];
+  return (response.data as HerBloomReminder[]) || [];
 };
 
 // Backward compatibility â€” no-op
