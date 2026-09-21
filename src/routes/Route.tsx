@@ -39,6 +39,7 @@ import PregnancyNutrition from "../pages/pregnancy/PregnancyNutrition";
 import PregnancyWellness from "../pages/pregnancy/PregnancyWellness";
 import PregnancyNotes from "../pages/pregnancy/PregnancyNotes";
 import PregnancyTimeline from "../pages/pregnancy/PregnancyTimeline";
+import PregnancyAppointments from "../pages/pregnancy/PregnancyAppointments";
 
 // Health Library
 import HealthLibrary from "../pages/health/HealthLibrary";
@@ -102,11 +103,7 @@ function AppRoutes() {
         ========================= */}
         <Route element={<UnauthLayout />}>
           {publicRoutes.map((route) => (
-            <Route
-              key={route.path}
-              path={route.path}
-              element={route.element}
-            />
+            <Route key={route.path} path={route.path} element={route.element} />
           ))}
         </Route>
 
@@ -116,385 +113,97 @@ function AppRoutes() {
         <Route element={<ProtectedRoute />}>
           <Route element={<AuthLayout />}>
 
-            {/* =========================
-                PROFILE
-            ========================= */}
+            {/* PROFILE */}
+            <Route path="/profile" element={<Profile />} />
+            <Route path="/profile/edit" element={<EditProfile />} />
+            <Route path="/profile/security" element={<AccountSecurity />} />
+            <Route path="/profile/settings" element={<AppSettings />} />
+            <Route path="/profile/privacy" element={<PrivacyTerms />} />
 
-            <Route
-              path="/profile"
-              element={<Profile />}
-            />
+            {/* PERIOD TRACKER */}
+            <Route path="/period-tracker" element={<PeriodDashboard />} />
+            <Route path="/period-tracker/setup" element={<CycleSetup />} />
+            <Route path="/period-tracker/flow" element={<FlowTracker />} />
+            <Route path="/period-tracker/symptoms" element={<SymptomsTracker />} />
+            <Route path="/period-tracker/medication" element={<MedicationTracker />} />
+            <Route path="/period-tracker/nutrition" element={<NutritionTracker />} />
+            <Route path="/period-tracker/wellness" element={<WellnessTracker />} />
+            <Route path="/period-tracker/notes" element={<PeriodNotes />} />
+            <Route path="/period-tracker/reports" element={<ReportsInsights />} />
+            <Route path="/period-tracker/partner-sharing" element={<PartnerSharing />} />
 
-            <Route
-              path="/profile/edit"
-              element={<EditProfile />}
-            />
+            {/* PREGNANCY TRACKER */}
+            <Route path="/pregnancy-tracker" element={<PregnancyDashboard />} />
+            <Route path="/pregnancy-tracker/setup" element={<PregnancySetup />} />
+            <Route path="/pregnancy-tracker/baby-development" element={<BabyDevelopment />} />
+            <Route path="/pregnancy-tracker/baby-movement" element={<BabyMovement />} />
+            <Route path="/pregnancy-tracker/contraction-timer" element={<ContractionTimer />} />
+            <Route path="/pregnancy-tracker/hospital-birth-planning" element={<HospitalBirthPlanning />} />
+            <Route path="/pregnancy-tracker/postpartum-transition" element={<PostpartumTransition />} />
+            <Route path="/pregnancy-tracker/education" element={<PregnancyEducation />} />
+            <Route path="/pregnancy-tracker/symptoms" element={<PregnancySymptoms />} />
+            <Route path="/pregnancy-tracker/nutrition" element={<PregnancyNutrition />} />
+            <Route path="/pregnancy-tracker/wellness" element={<PregnancyWellness />} />
+            <Route path="/pregnancy-tracker/notes" element={<PregnancyNotes />} />
+            <Route path="/pregnancy-tracker/timeline" element={<PregnancyTimeline />} />
+            <Route path="/pregnancy-tracker/appointments" element={<PregnancyAppointments />} />
 
-            <Route
-              path="/profile/security"
-              element={<AccountSecurity />}
-            />
-
-            <Route
-              path="/profile/settings"
-              element={<AppSettings />}
-            />
-
-            <Route
-              path="/profile/privacy"
-              element={<PrivacyTerms />}
-            />
-
-            {/* =========================
-                PERIOD TRACKER
-            ========================= */}
-
-            <Route
-              path="/period-tracker"
-              element={<PeriodDashboard />}
-            />
-
-            <Route
-              path="/period-tracker/setup"
-              element={<CycleSetup />}
-            />
-
-            <Route
-              path="/period-tracker/flow"
-              element={<FlowTracker />}
-            />
-
-            <Route
-              path="/period-tracker/symptoms"
-              element={<SymptomsTracker />}
-            />
-
-            <Route
-              path="/period-tracker/medication"
-              element={<MedicationTracker />}
-            />
-
-            <Route
-              path="/period-tracker/nutrition"
-              element={<NutritionTracker />}
-            />
-
-            <Route
-              path="/period-tracker/wellness"
-              element={<WellnessTracker />}
-            />
-
-            <Route
-              path="/period-tracker/notes"
-              element={<PeriodNotes />}
-            />
-
-            <Route
-              path="/period-tracker/reports"
-              element={<ReportsInsights />}
-            />
-
-            <Route
-              path="/period-tracker/partner-sharing"
-              element={<PartnerSharing />}
-            />
-
-            {/* =========================
-                PREGNANCY TRACKER
-            ========================= */}
-
-            <Route
-              path="/pregnancy-tracker"
-              element={<PregnancyDashboard />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/setup"
-              element={<PregnancySetup />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/baby-development"
-              element={<BabyDevelopment />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/baby-movement"
-              element={<BabyMovement />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/contraction-timer"
-              element={<ContractionTimer />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/hospital-birth-planning"
-              element={<HospitalBirthPlanning />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/postpartum-transition"
-              element={<PostpartumTransition />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/education"
-              element={<PregnancyEducation />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/symptoms"
-              element={<PregnancySymptoms />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/nutrition"
-              element={<PregnancyNutrition />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/wellness"
-              element={<PregnancyWellness />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/notes"
-              element={<PregnancyNotes />}
-            />
-
-            <Route
-              path="/pregnancy-tracker/timeline"
-              element={<PregnancyTimeline />}
-            />
-
-            {/* =========================
-                HEALTH LIBRARY
-            ========================= */}
-
-            <Route
-              path="/health-library"
-              element={<HealthLibrary />}
-            />
-
-            <Route
-              path="/health-library/categories"
-              element={<HealthCategories />}
-            />
-
-            <Route
-              path="/health-library/search"
-              element={<HealthSearch />}
-            />
-
-            <Route
-              path="/health-library/articles"
-              element={<HealthArticles />}
-            />
-
+            {/* HEALTH LIBRARY */}
+            <Route path="/health-library" element={<HealthLibrary />} />
+            <Route path="/health-library/categories" element={<HealthCategories />} />
+            <Route path="/health-library/search" element={<HealthSearch />} />
+            <Route path="/health-library/articles" element={<HealthArticles />} />
             {/* Supports both article URL formats */}
-            <Route
-              path="/health-library/articles/:id"
-              element={<HealthArticleDetails />}
-            />
+            <Route path="/health-library/articles/:id" element={<HealthArticleDetails />} />
+            <Route path="/health-library/article/:id" element={<HealthArticleDetails />} />
+            <Route path="/health-library/saved" element={<HealthSaved />} />
 
-            <Route
-              path="/health-library/article/:id"
-              element={<HealthArticleDetails />}
-            />
+            {/* HEALTHCARE PROFESSIONALS */}
+            <Route path="/healthcare-professionals" element={<FindProfessional />} />
+            <Route path="/professionals" element={<FindProfessional />} /> {/* short alias */}
+            <Route path="/healthcare-professionals/:id" element={<ProfessionalProfile />} />
+            <Route path="/healthcare-professionals/:id/chat" element={<ConsultationChat />} />
 
-            <Route
-              path="/health-library/saved"
-              element={<HealthSaved />}
-            />
+            {/* EMERGENCY ASSISTANCE */}
+            <Route path="/emergency" element={<EmergencyHome />} />
+            <Route path="/emergency/contacts" element={<EmergencyContacts />} />
+            <Route path="/emergency/facilities" element={<FindHealthcareFacility />} />
+            <Route path="/emergency/services" element={<EmergencyServices />} />
+            <Route path="/emergency/information" element={<EmergencyInformation />} />
 
-            {/* =========================
-                HEALTHCARE PROFESSIONALS
-            ========================= */}
+            {/* COMMUNITY */}
+            <Route path="/community" element={<CommunityHome />} />
+            <Route path="/community/posts" element={<CommunityPosts />} />
+            <Route path="/community/comments" element={<CommunityComments />} />
+            <Route path="/community/professional-content" element={<ProfessionalHealthContent />} />
+            <Route path="/community/verified" element={<VerifiedProof />} />
+            <Route path="/community/profile" element={<UserProfile />} />
 
-            <Route
-              path="/healthcare-professionals"
-              element={<FindProfessional />}
-            />
+            {/* APPOINTMENTS — fixed paths are matched before /:id automatically */}
+            <Route path="/appointments" element={<Appointments />} />
+            <Route path="/appointments/book" element={<BookAppointment />} />
+            <Route path="/appointments/my-appointments" element={<MyAppointments />} />
+            <Route path="/appointments/history" element={<AppointmentHistory />} />
+            <Route path="/appointments/:id" element={<AppointmentDetails />} />
+            <Route path="/appointments/:id/reschedule" element={<RescheduleAppointment />} />
+            <Route path="/appointments/:id/cancel" element={<CancelAppointment />} />
 
-            <Route
-              path="/healthcare-professionals/:id"
-              element={<ProfessionalProfile />}
-            />
+            {/* NOTIFICATIONS & REMINDERS */}
+            <Route path="/notifications" element={<Notifications />} />
+            <Route path="/notifications/create" element={<CreateReminder />} />
+            <Route path="/notifications/reminders" element={<ReminderList />} />
+            <Route path="/notifications/reminders/:id/edit" element={<EditReminder />} />
+            <Route path="/notifications/settings" element={<NotificationSettings />} />
 
-            <Route
-              path="/healthcare-professionals/:id/chat"
-              element={<ConsultationChat />}
-            />
+            {/* PREMIUM */}
+            <Route path="/premium" element={<Premium />} />
+            <Route path="/premium/plans" element={<PremiumPlans />} />
+            <Route path="/premium/checkout" element={<PremiumCheckout />} />
+            <Route path="/premium/features" element={<PremiumFeatures />} />
+            <Route path="/premium/status" element={<PremiumStatus />} />
 
-            {/* =========================
-                EMERGENCY ASSISTANCE
-            ========================= */}
-
-            <Route
-              path="/emergency"
-              element={<EmergencyHome />}
-            />
-
-            <Route
-              path="/emergency/contacts"
-              element={<EmergencyContacts />}
-            />
-
-            <Route
-              path="/emergency/facilities"
-              element={<FindHealthcareFacility />}
-            />
-
-            <Route
-              path="/emergency/services"
-              element={<EmergencyServices />}
-            />
-
-            <Route
-              path="/emergency/information"
-              element={<EmergencyInformation />}
-            />
-
-            {/* =========================
-                COMMUNITY
-            ========================= */}
-
-            <Route
-              path="/community"
-              element={<CommunityHome />}
-            />
-
-            <Route
-              path="/community/posts"
-              element={<CommunityPosts />}
-            />
-
-            <Route
-              path="/community/comments"
-              element={<CommunityComments />}
-            />
-
-            <Route
-              path="/community/professional-content"
-              element={<ProfessionalHealthContent />}
-            />
-
-            <Route
-              path="/community/verified"
-              element={<VerifiedProof />}
-            />
-
-            <Route
-              path="/community/profile"
-              element={<UserProfile />}
-            />
-
-            {/* =========================
-                APPOINTMENTS
-            ========================= */}
-
-            <Route
-              path="/appointments"
-              element={<Appointments />}
-            />
-
-            <Route
-              path="/appointments/book"
-              element={<BookAppointment />}
-            />
-
-            <Route
-              path="/appointments/:id"
-              element={<AppointmentDetails />}
-            />
-
-            <Route
-              path="/appointments/my-appointments"
-              element={<MyAppointments />}
-            />
-
-            <Route
-              path="/appointments/history"
-              element={<AppointmentHistory />}
-            />
-
-            <Route
-              path="/appointments/:id/reschedule"
-              element={<RescheduleAppointment />}
-            />
-
-            <Route
-              path="/appointments/:id/cancel"
-              element={<CancelAppointment />}
-            />
-
-            {/* =========================
-                NOTIFICATIONS & REMINDERS
-            ========================= */}
-
-            <Route
-              path="/notifications"
-              element={<Notifications />}
-            />
-
-            <Route
-              path="/notifications/create"
-              element={<CreateReminder />}
-            />
-
-            <Route
-              path="/notifications/reminders"
-              element={<ReminderList />}
-            />
-
-            <Route
-              path="/notifications/reminders/:id/edit"
-              element={<EditReminder />}
-            />
-
-            <Route
-              path="/notifications/settings"
-              element={<NotificationSettings />}
-            />
-
-            {/* =========================
-                PREMIUM
-            ========================= */}
-
-            <Route
-              path="/premium"
-              element={<Premium />}
-            />
-
-            <Route
-              path="/premium/plans"
-              element={<PremiumPlans />}
-            />
-
-            <Route
-              path="/premium/checkout"
-              element={<PremiumCheckout />}
-            />
-
-            <Route
-              path="/premium/features"
-              element={<PremiumFeatures />}
-            />
-
-            <Route
-              path="/premium/status"
-              element={<PremiumStatus />}
-            />
-
-            {/* =========================
-                PAYMENT CALLBACK
-            ========================= */}
-
-            <Route
-              path="/payment/callback"
-              element={<PaymentCallback />}
-            />
+            {/* PAYMENT CALLBACK */}
+            <Route path="/payment/callback" element={<PaymentCallback />} />
 
           </Route>
         </Route>

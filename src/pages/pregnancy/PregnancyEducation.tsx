@@ -1,84 +1,39 @@
-import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
+import { usePregnancyWeek } from "../../hooks/usePregnancyWeek";
 
 function PregnancyEducation() {
   const navigate = useNavigate();
+  const { currentWeek, loading } = usePregnancyWeek();
 
-  const [currentWeek, setCurrentWeek] = useState<number | null>(null);
+  const trimester =
+    currentWeek === null
+      ? "Pregnancy education"
+      : currentWeek <= 12
+      ? "First trimester"
+      : currentWeek <= 27
+      ? "Second trimester"
+      : "Third trimester";
 
-  useEffect(() => {
-    const savedDueDate = localStorage.getItem("pregnancyDueDate");
+  const weeklyTitle = currentWeek === null ? "Your pregnancy journey" : `Understanding Week ${currentWeek}`;
 
-    if (!savedDueDate) {
-      return;
-    }
+  const weeklyDescription =
+    currentWeek === null
+      ? "Set your pregnancy due date to see education that is relevant to your current stage."
+      : currentWeek <= 4
+      ? "Your pregnancy journey is beginning. Learn about early pregnancy and the changes happening in your body."
+      : currentWeek <= 12
+      ? "Your baby is developing quickly. Learn about early pregnancy changes, prenatal care and healthy habits."
+      : currentWeek <= 27
+      ? "Your pregnancy is progressing. Learn about your growing baby, body changes and preparing for the months ahead."
+      : "You are in the final stage of pregnancy. Learn about preparing for birth, hospital planning and the changes ahead.";
 
-    const due = new Date(savedDueDate);
-    const today = new Date();
-
-    due.setHours(0, 0, 0, 0);
-    today.setHours(0, 0, 0, 0);
-
-    const difference = due.getTime() - today.getTime();
-
-    const remainingDays = Math.ceil(
-      difference / (1000 * 60 * 60 * 24)
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-pink-50">
+        <p className="text-gray-600">Loading...</p>
+      </div>
     );
-
-    const pregnancyLength = 280;
-    const daysPregnant = pregnancyLength - remainingDays;
-
-    const calculatedWeek =
-      Math.floor(daysPregnant / 7) + 1;
-
-    setCurrentWeek(
-      Math.min(Math.max(calculatedWeek, 1), 40)
-    );
-  }, []);
-
-  const getTrimester = () => {
-    if (currentWeek === null) {
-      return "Pregnancy education";
-    }
-
-    if (currentWeek <= 12) {
-      return "First trimester";
-    }
-
-    if (currentWeek <= 27) {
-      return "Second trimester";
-    }
-
-    return "Third trimester";
-  };
-
-  const getWeeklyTitle = () => {
-    if (currentWeek === null) {
-      return "Your pregnancy journey";
-    }
-
-    return `Understanding Week ${currentWeek}`;
-  };
-
-  const getWeeklyDescription = () => {
-    if (currentWeek === null) {
-      return "Set your pregnancy due date to see education that is relevant to your current stage.";
-    }
-
-    if (currentWeek <= 4) {
-      return "Your pregnancy journey is beginning. Learn about early pregnancy and the changes happening in your body.";
-    }
-
-    if (currentWeek <= 12) {
-      return "Your baby is developing quickly. Learn about early pregnancy changes, prenatal care and healthy habits.";
-    }
-
-    if (currentWeek <= 27) {
-      return "Your pregnancy is progressing. Learn about your growing baby, body changes and preparing for the months ahead.";
-    }
-
-    return "You are in the final stage of pregnancy. Learn about preparing for birth, hospital planning and the changes ahead.";
-  };
+  }
 
   return (
     <div className="min-h-screen bg-pink-50 pb-10">
@@ -86,7 +41,6 @@ function PregnancyEducation() {
       {/* Header */}
       <header className="bg-white px-5 pb-5 pt-8 shadow-sm">
         <div className="mx-auto flex max-w-md items-center gap-3">
-
           <button
             onClick={() => navigate(-1)}
             className="flex h-10 w-10 items-center justify-center rounded-full bg-pink-50 text-lg"
@@ -94,17 +48,10 @@ function PregnancyEducation() {
           >
             ←
           </button>
-
           <div>
-            <h1 className="text-xl font-bold text-pink-700">
-              Pregnancy Education 📚
-            </h1>
-
-            <p className="text-xs text-gray-500">
-              Learn about your pregnancy journey
-            </p>
+            <h1 className="text-xl font-bold text-pink-700">Pregnancy Education 📚</h1>
+            <p className="text-xs text-gray-500">Learn about your pregnancy journey</p>
           </div>
-
         </div>
       </header>
 
@@ -112,276 +59,159 @@ function PregnancyEducation() {
 
         {/* Current Stage */}
         <section className="rounded-3xl bg-pink-600 p-6 text-white shadow-lg">
-
-          <p className="text-sm opacity-80">
-            {getTrimester()}
-          </p>
-
-          <h2 className="mt-1 text-2xl font-bold">
-            {currentWeek
-              ? `Week ${currentWeek}`
-              : "Your pregnancy"}
-          </h2>
-
-          <p className="mt-3 text-sm leading-6 opacity-90">
-            {getWeeklyDescription()}
-          </p>
-
+          <p className="text-sm opacity-80">{trimester}</p>
+          <h2 className="mt-1 text-2xl font-bold">{currentWeek ? `Week ${currentWeek}` : "Your pregnancy"}</h2>
+          <p className="mt-3 text-sm leading-6 opacity-90">{weeklyDescription}</p>
+          {!currentWeek && (
+            <button
+              onClick={() => navigate("/pregnancy-tracker/setup")}
+              className="mt-4 w-full rounded-xl bg-white py-3 text-sm font-semibold text-pink-600"
+            >
+              Set Up Pregnancy
+            </button>
+          )}
         </section>
 
         {/* Weekly Education */}
         <section className="rounded-3xl bg-white p-5 shadow-sm">
-
           <div className="flex items-center gap-3">
-
-            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-100 text-2xl">
-              🌸
-            </div>
-
+            <div className="flex h-12 w-12 items-center justify-center rounded-full bg-pink-100 text-2xl">🌸</div>
             <div>
-              <h2 className="font-bold text-gray-900">
-                {getWeeklyTitle()}
-              </h2>
-
-              <p className="text-sm text-gray-500">
-                Information for your stage
-              </p>
+              <h2 className="font-bold text-gray-900">{weeklyTitle}</h2>
+              <p className="text-sm text-gray-500">Information for your stage</p>
             </div>
-
           </div>
-
           <div className="mt-5 rounded-2xl bg-pink-50 p-4">
-
-            <h3 className="font-semibold text-gray-900">
-              What to know
-            </h3>
-
+            <h3 className="font-semibold text-gray-900">What to know</h3>
             <p className="mt-2 text-sm leading-6 text-gray-700">
-              Pregnancy can bring many physical and emotional
-              changes. Keeping track of your appointments,
-              symptoms and wellbeing can help you have useful
-              conversations with your healthcare professional.
+              Pregnancy can bring many physical and emotional changes. Keeping track of your
+              appointments, symptoms and wellbeing can help you have useful conversations with your
+              healthcare professional.
             </p>
-
           </div>
-
         </section>
 
         {/* Pregnancy Topics */}
         <section>
-
-          <h2 className="mb-3 text-lg font-bold text-gray-900">
-            Pregnancy topics
-          </h2>
-
+          <h2 className="mb-3 text-lg font-bold text-gray-900">Pregnancy topics</h2>
           <div className="space-y-3">
 
-            {/* Body Changes */}
             <div className="rounded-2xl bg-white p-5 shadow-sm">
-
               <div className="flex items-center gap-3">
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-purple-100 text-xl">
-                  🤰🏽
-                </div>
-
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-purple-100 text-xl">🤰🏽</div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">
-                    Changes in your body
-                  </h3>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    Learn about common pregnancy changes.
-                  </p>
+                  <h3 className="font-semibold text-gray-900">Changes in your body</h3>
+                  <p className="mt-1 text-sm text-gray-500">Learn about common pregnancy changes.</p>
                 </div>
-
               </div>
-
               <p className="mt-4 text-sm leading-6 text-gray-700">
-                Your body changes throughout pregnancy.
-                Some changes are expected, while others
-                should be discussed with a qualified
-                healthcare professional.
+                Your body changes throughout pregnancy. Some changes are expected, while others should
+                be discussed with a qualified healthcare professional.
               </p>
-
             </div>
 
-            {/* Baby Development */}
             <div className="rounded-2xl bg-white p-5 shadow-sm">
-
               <div className="flex items-center gap-3">
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-xl">
-                  👶🏽
-                </div>
-
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-blue-100 text-xl">👶🏽</div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">
-                    Baby development
-                  </h3>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    Follow your baby's development.
-                  </p>
+                  <h3 className="font-semibold text-gray-900">Baby development</h3>
+                  <p className="mt-1 text-sm text-gray-500">Follow your baby's development.</p>
                 </div>
-
               </div>
-
               <button
-                onClick={() =>
-                  navigate(
-                    "/pregnancy-tracker/baby-development"
-                  )
-                }
+                onClick={() => navigate("/pregnancy-tracker/baby-development")}
                 className="mt-4 w-full rounded-xl bg-pink-100 py-3 text-sm font-semibold text-pink-700"
               >
                 View Baby Development
               </button>
-
             </div>
 
-            {/* Nutrition */}
             <div className="rounded-2xl bg-white p-5 shadow-sm">
-
               <div className="flex items-center gap-3">
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-green-100 text-xl">
-                  🥗
-                </div>
-
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-green-100 text-xl">🥗</div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">
-                    Nutrition
-                  </h3>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    Learn about healthy pregnancy nutrition.
-                  </p>
+                  <h3 className="font-semibold text-gray-900">Nutrition</h3>
+                  <p className="mt-1 text-sm text-gray-500">Learn about healthy pregnancy nutrition.</p>
                 </div>
-
               </div>
-
               <button
-                onClick={() =>
-                  navigate(
-                    "/pregnancy-tracker/nutrition"
-                  )
-                }
+                onClick={() => navigate("/pregnancy-tracker/nutrition")}
                 className="mt-4 w-full rounded-xl bg-green-100 py-3 text-sm font-semibold text-green-700"
               >
                 Open Nutrition
               </button>
-
             </div>
 
-            {/* Wellness */}
             <div className="rounded-2xl bg-white p-5 shadow-sm">
-
               <div className="flex items-center gap-3">
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-teal-100 text-xl">
-                  🌿
-                </div>
-
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-teal-100 text-xl">🌿</div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">
-                    Pregnancy wellness
-                  </h3>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    Learn about healthy everyday habits.
-                  </p>
+                  <h3 className="font-semibold text-gray-900">Pregnancy wellness</h3>
+                  <p className="mt-1 text-sm text-gray-500">Learn about healthy everyday habits.</p>
                 </div>
-
               </div>
-
               <button
-                onClick={() =>
-                  navigate(
-                    "/pregnancy-tracker/wellness"
-                  )
-                }
+                onClick={() => navigate("/pregnancy-tracker/wellness")}
                 className="mt-4 w-full rounded-xl bg-teal-100 py-3 text-sm font-semibold text-teal-700"
               >
                 Open Wellness
               </button>
-
             </div>
 
-            {/* Preparing for Birth */}
             <div className="rounded-2xl bg-white p-5 shadow-sm">
-
               <div className="flex items-center gap-3">
-
-                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-rose-100 text-xl">
-                  🏥
-                </div>
-
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-rose-100 text-xl">🏥</div>
                 <div>
-                  <h3 className="font-semibold text-gray-900">
-                    Preparing for birth
-                  </h3>
-
-                  <p className="mt-1 text-sm text-gray-500">
-                    Learn about hospital and birth planning.
-                  </p>
+                  <h3 className="font-semibold text-gray-900">Preparing for birth</h3>
+                  <p className="mt-1 text-sm text-gray-500">Learn about hospital and birth planning.</p>
                 </div>
-
               </div>
-
               <button
-                onClick={() =>
-                  navigate(
-                    "/pregnancy-tracker/hospital-birth-planning"
-                  )
-                }
+                onClick={() => navigate("/pregnancy-tracker/hospital-birth-planning")}
                 className="mt-4 w-full rounded-xl bg-rose-100 py-3 text-sm font-semibold text-rose-700"
               >
                 Open Birth Planning
               </button>
-
             </div>
 
+            {/* Health library articles filtered to pregnancy */}
+            <div className="rounded-2xl bg-white p-5 shadow-sm">
+              <div className="flex items-center gap-3">
+                <div className="flex h-11 w-11 items-center justify-center rounded-full bg-yellow-100 text-xl">📖</div>
+                <div>
+                  <h3 className="font-semibold text-gray-900">Trusted articles</h3>
+                  <p className="mt-1 text-sm text-gray-500">Read pregnancy articles in the Health Library.</p>
+                </div>
+              </div>
+              <button
+                onClick={() => navigate("/health-library")}
+                className="mt-4 w-full rounded-xl bg-yellow-100 py-3 text-sm font-semibold text-yellow-700"
+              >
+                Open Health Library
+              </button>
+            </div>
           </div>
-
         </section>
 
         {/* Important Reminder */}
         <section className="rounded-3xl bg-white p-5 shadow-sm">
-
           <div className="flex items-center gap-3">
-
-            <span className="text-2xl">
-              💗
-            </span>
-
-            <h2 className="font-bold text-gray-900">
-              Remember
-            </h2>
-
+            <span className="text-2xl">💗</span>
+            <h2 className="font-bold text-gray-900">Remember</h2>
           </div>
-
           <p className="mt-3 text-sm leading-6 text-gray-700">
-            Educational information is here to help you
-            understand your pregnancy. It does not replace
-            advice, diagnosis or care from a qualified
-            healthcare professional.
+            Educational information is here to help you understand your pregnancy. It does not replace
+            advice, diagnosis or care from a qualified healthcare professional.
           </p>
-
         </section>
 
-        {/* Back */}
         <button
-          onClick={() =>
-            navigate("/pregnancy-tracker")
-          }
+          onClick={() => navigate("/pregnancy-tracker")}
           className="w-full rounded-xl border border-pink-200 bg-white py-3 font-semibold text-pink-600"
         >
           Back to Pregnancy Tracker
         </button>
-
       </main>
-
     </div>
   );
 }

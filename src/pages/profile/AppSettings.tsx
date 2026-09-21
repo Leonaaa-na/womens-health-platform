@@ -1,125 +1,110 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-
-interface AppSettingsData {
-  darkMode: boolean;
-  compactView: boolean;
-}
+import apiClient from "../../api/client";
 
 const SETTINGS_KEY = "herbloomAppSettings";
 
-const defaultSettings: AppSettingsData = {
-  darkMode: false,
-  compactView: false,
+// Leftovers from before the backend existed — safe to remove now
+const OLD_LOCAL_KEYS = [
+  "herbloomAppointments",
+  "herbloomCommunityPosts",
+  "herbloomSupportedPosts",
+  "herbloomCommunityComments",
+  "herbloomUserProfile",
+  "herbloomNotificationSettings",
+  "herbloomReminders",
+];
+
+const applyClasses = (dark: boolean, compact: boolean) => {
+  document.documentElement.classList.toggle("dark", dark);
+  document.documentElement.classList.toggle("compact", compact);
 };
+
+const readLocal = () => {
+  try {
+    const parsed = JSON.parse(localStorage.getItem(SETTINGS_KEY) || "{}");
+    return { darkMode: !!parsed.darkMode, compactView: !!parsed.compactView };
+  } catch {
+    return { darkMode: false, compactView: false };
+  }
+};
+
+const writeLocal = (darkMode: boolean, compactView: boolean) =>
+  localStorage.setItem(SETTINGS_KEY, JSON.stringify({ darkMode, compactView }));
+
+function Toggle({ on, onClick, label }: { on: boolean; onClick: () => void; label: string }) {
+  return (
+    <button
+      type="button"
+      onClick={onClick}
+      aria-label={label}
+      aria-pressed={on}
+      className={`relative h-7 w-12 shrink-0 rounded-full transition ${on ? "bg-pink-500" : "bg-gray-300"}`}
+    >
+      <span className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${on ? "left-6" : "left-1"}`} />
+    </button>
+  );
+}
 
 const AppSettings = () => {
   const navigate = useNavigate();
 
-  const [darkMode, setDarkMode] = useState(false);
-  const [compactView, setCompactView] = useState(false);
-  const [saved, setSaved] = useState(false);
+  const initial = readLocal();
+  const [darkMode, setDarkMode] = useState(initial.darkMode);
+  const [compactView, setCompactView] = useState(initial.compactView);
+  const [message, setMessage] = useState("");
+  const [cleared, setCleared] = useState(false);
 
+  // Your account's theme wins over this browser's copy
   useEffect(() => {
-    try {
-      const savedSettings = localStorage.getItem(SETTINGS_KEY);
-
-      if (!savedSettings) {
-        document.documentElement.classList.remove("dark");
-        document.documentElement.classList.remove("compact");
-        return;
+    const load = async () => {
+      try {
+        const theme = (await apiClient.get("/users/profile")).data.data?.theme;
+        if (theme === "dark" || theme === "light") {
+          const dark = theme === "dark";
+          setDarkMode(dark);
+          writeLocal(dark, readLocal().compactView);
+          applyClasses(dark, readLocal().compactView);
+        }
+      } catch {
+        // offline: keep the local copy
       }
-
-      const parsed = JSON.parse(
-        savedSettings
-      ) as Partial<AppSettingsData>;
-
-      const settings: AppSettingsData = {
-        ...defaultSettings,
-        ...parsed,
-      };
-
-      setDarkMode(settings.darkMode);
-      setCompactView(settings.compactView);
-
-      if (settings.darkMode) {
-        document.documentElement.classList.add("dark");
-      } else {
-        document.documentElement.classList.remove("dark");
-      }
-
-      if (settings.compactView) {
-        document.documentElement.classList.add("compact");
-      } else {
-        document.documentElement.classList.remove("compact");
-      }
-    } catch {
-      document.documentElement.classList.remove("dark");
-      document.documentElement.classList.remove("compact");
-    }
+    };
+    applyClasses(initial.darkMode, initial.compactView);
+    load();
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  const saveSettings = (
-    newDarkMode: boolean,
-    newCompactView: boolean
-  ) => {
-    localStorage.setItem(
-      SETTINGS_KEY,
-      JSON.stringify({
-        darkMode: newDarkMode,
-        compactView: newCompactView,
-      })
-    );
+  const flash = (text: string) => {
+    setMessage(text);
+    setTimeout(() => setMessage(""), 2000);
   };
 
-  const handleDarkModeToggle = () => {
-    const newValue = !darkMode;
-
-    setDarkMode(newValue);
-
-    if (newValue) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
+  const handleDarkModeToggle = async () => {
+    const next = !darkMode;
+    setDarkMode(next);
+    applyClasses(next, compactView);
+    writeLocal(next, compactView);
+    try {
+      await apiClient.put("/users/profile", { theme: next ? "dark" : "light" });
+      flash(next ? "🌙 Dark mode on — saved to your account." : "☀️ Light mode on — saved to your account.");
+    } catch {
+      flash("Saved on this device. We'll sync it to your account next time.");
     }
-
-    saveSettings(newValue, compactView);
   };
 
+  // Compact view is a per-device choice (small phone vs big screen)
   const handleCompactViewToggle = () => {
-    const newValue = !compactView;
-
-    setCompactView(newValue);
-
-    if (newValue) {
-      document.documentElement.classList.add("compact");
-    } else {
-      document.documentElement.classList.remove("compact");
-    }
-
-    saveSettings(darkMode, newValue);
+    const next = !compactView;
+    setCompactView(next);
+    applyClasses(darkMode, next);
+    writeLocal(darkMode, next);
+    flash(next ? "Compact view on for this device." : "Standard spacing on for this device.");
   };
 
-  const handleSave = () => {
-    saveSettings(darkMode, compactView);
-
-    if (darkMode) {
-      document.documentElement.classList.add("dark");
-    } else {
-      document.documentElement.classList.remove("dark");
-    }
-
-    if (compactView) {
-      document.documentElement.classList.add("compact");
-    } else {
-      document.documentElement.classList.remove("compact");
-    }
-
-    setSaved(true);
-
-    setTimeout(() => {
-      setSaved(false);
-    }, 2000);
+  const clearOldData = () => {
+    OLD_LOCAL_KEYS.forEach((key) => localStorage.removeItem(key));
+    setCleared(true);
   };
 
   return (
@@ -135,185 +120,86 @@ const AppSettings = () => {
           >
             ← Back to Profile
           </button>
-
           <div className="text-center">
             <div className="mx-auto flex h-20 w-20 items-center justify-center rounded-full bg-gradient-to-br from-pink-100 to-purple-100 text-4xl shadow-md">
               ⚙️
             </div>
-
-            <h1 className="mt-5 text-3xl font-bold text-gray-800">
-              App Settings
-            </h1>
-
-            <p className="mt-2 text-gray-600">
-              Manage your general HerBloom app preferences.
-            </p>
+            <h1 className="mt-5 text-3xl font-bold text-gray-800">App Settings</h1>
+            <p className="mt-2 text-gray-600">Manage your general HerBloom app preferences. Changes save automatically.</p>
           </div>
         </div>
 
-        {/* Settings Card */}
         <div className="rounded-3xl border border-pink-100 bg-white p-8 shadow-lg">
-
-          {/* Saved Message */}
-          {saved && (
+          {message ? (
             <div className="mb-6 rounded-xl border border-green-200 bg-green-50 p-4 text-sm font-semibold text-green-700">
-              ✅ Your app settings have been saved.
+              {message}
             </div>
-          )}
+          ) : null}
 
           {/* Appearance */}
-          <div>
-            <h2 className="text-xl font-bold text-gray-800">
-              🎨 Appearance
-            </h2>
-
-            <p className="mt-2 text-sm text-gray-500">
-              Choose how HerBloom should look and feel.
-            </p>
-          </div>
+          <h2 className="text-xl font-bold text-gray-800">🎨 Appearance</h2>
+          <p className="mt-2 text-sm text-gray-500">Choose how HerBloom should look and feel.</p>
 
           <div className="mt-5 divide-y divide-gray-100 rounded-2xl border border-gray-100">
-
-            {/* Dark Mode */}
             <div className="flex items-center justify-between gap-4 p-5">
-
               <div>
-                <h3 className="font-semibold text-gray-800">
-                  Dark Mode
-                </h3>
-
-                <p className="mt-1 text-sm text-gray-500">
-                  Use a darker appearance throughout the app.
-                </p>
+                <h3 className="font-semibold text-gray-800">Dark Mode</h3>
+                <p className="mt-1 text-sm text-gray-500">Use a darker appearance. Follows you to every device you sign in on.</p>
               </div>
-
-              <button
-                type="button"
-                onClick={handleDarkModeToggle}
-                className={`relative h-7 w-12 shrink-0 rounded-full transition ${
-                  darkMode
-                    ? "bg-pink-500"
-                    : "bg-gray-300"
-                }`}
-                aria-label="Toggle dark mode"
-                aria-pressed={darkMode}
-              >
-                <span
-                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${
-                    darkMode
-                      ? "left-6"
-                      : "left-1"
-                  }`}
-                />
-              </button>
-
+              <Toggle on={darkMode} onClick={handleDarkModeToggle} label="Toggle dark mode" />
             </div>
 
-            {/* Compact View */}
             <div className="flex items-center justify-between gap-4 p-5">
-
               <div>
-                <h3 className="font-semibold text-gray-800">
-                  Compact View
-                </h3>
-
-                <p className="mt-1 text-sm text-gray-500">
-                  Reduce spacing and make more content visible on screen.
-                </p>
+                <h3 className="font-semibold text-gray-800">Compact View</h3>
+                <p className="mt-1 text-sm text-gray-500">Reduce spacing on this device to fit more on screen.</p>
               </div>
-
-              <button
-                type="button"
-                onClick={handleCompactViewToggle}
-                className={`relative h-7 w-12 shrink-0 rounded-full transition ${
-                  compactView
-                    ? "bg-pink-500"
-                    : "bg-gray-300"
-                }`}
-                aria-label="Toggle compact view"
-                aria-pressed={compactView}
-              >
-                <span
-                  className={`absolute top-1 h-5 w-5 rounded-full bg-white shadow transition ${
-                    compactView
-                      ? "left-6"
-                      : "left-1"
-                  }`}
-                />
-              </button>
-
+              <Toggle on={compactView} onClick={handleCompactViewToggle} label="Toggle compact view" />
             </div>
-
           </div>
 
-          {/* Current Appearance */}
           <div className="mt-6 rounded-2xl bg-gray-50 p-5">
-
             <div className="flex items-center gap-3">
-              <span className="text-2xl">
-                {darkMode ? "🌙" : "☀️"}
-              </span>
-
+              <span className="text-2xl">{darkMode ? "🌙" : "☀️"}</span>
               <div>
-                <h3 className="font-semibold text-gray-800">
-                  {darkMode
-                    ? "Dark Mode is On"
-                    : "Light Mode is On"}
-                </h3>
-
+                <h3 className="font-semibold text-gray-800">{darkMode ? "Dark Mode is On" : "Light Mode is On"}</h3>
                 <p className="mt-1 text-sm text-gray-500">
-                  {compactView
-                    ? "Compact View is also enabled."
-                    : "Standard spacing is being used."}
+                  {compactView ? "Compact View is also enabled." : "Standard spacing is being used."}
                 </p>
               </div>
+            </div>
+          </div>
 
+          {/* Data */}
+          <h2 className="mt-8 text-xl font-bold text-gray-800">💾 Data & Storage</h2>
+          <p className="mt-2 text-sm text-gray-500">Where your HerBloom information lives.</p>
+
+          <div className="mt-5 space-y-4">
+            <div className="rounded-2xl border border-green-100 bg-green-50 p-5">
+              <h3 className="font-semibold text-gray-800">☁️ Saved to your account</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                Your trackers, appointments, reminders, community activity and settings are stored securely on HerBloom's
+                servers, so they're there whenever you sign in.
+              </p>
             </div>
 
+            <div className="rounded-2xl border border-gray-100 bg-gray-50 p-5">
+              <h3 className="font-semibold text-gray-800">📱 Old data on this device</h3>
+              <p className="mt-2 text-sm leading-6 text-gray-600">
+                Earlier versions of HerBloom kept some demo data in this browser. It isn't used anymore and can be safely
+                removed. Your account data isn't affected.
+              </p>
+              <button
+                type="button"
+                onClick={clearOldData}
+                disabled={cleared}
+                className="mt-4 rounded-xl border border-gray-300 bg-white px-5 py-2.5 text-sm font-semibold text-gray-700 transition hover:bg-gray-100 disabled:opacity-60"
+              >
+                {cleared ? "✓ Old data cleared" : "Clear old device data"}
+              </button>
+            </div>
           </div>
-
-          {/* Data & Storage */}
-          <div className="mt-8">
-
-            <h2 className="text-xl font-bold text-gray-800">
-              💾 Data & Storage
-            </h2>
-
-            <p className="mt-2 text-sm text-gray-500">
-              Manage information stored locally by the HerBloom app.
-            </p>
-
-          </div>
-
-          <div className="mt-5 rounded-2xl border border-gray-100 bg-gray-50 p-5">
-
-            <h3 className="font-semibold text-gray-800">
-              Local App Data
-            </h3>
-
-            <p className="mt-2 text-sm leading-6 text-gray-600">
-              Some preferences and temporary app information may be
-              stored on your device while HerBloom is being developed.
-            </p>
-
-            <p className="mt-3 text-xs text-gray-400">
-              Full account data management will be connected to your
-              HerBloom account later.
-            </p>
-
-          </div>
-
-          {/* Save */}
-          <button
-            type="button"
-            onClick={handleSave}
-            className="mt-8 w-full rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-6 py-3.5 text-sm font-bold text-white shadow-md transition hover:from-pink-600 hover:to-purple-700"
-          >
-            Save Settings
-          </button>
-
         </div>
-
       </div>
     </div>
   );

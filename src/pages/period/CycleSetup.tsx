@@ -20,23 +20,34 @@ function CycleSetup() {
     setError("");
 
     try {
-      await apiClient.post("/cycles", {
-        startDate,
-        endDate: "",
-        notes: "",
-      });
-
-      // Also update the profile with cycle length info
-      await apiClient.put("/profile", {
+      /*
+       * 1. Save the user's usual lengths FIRST,
+       *    so the backend uses them for predictions
+       *    instead of the default 28 / 5 days.
+       */
+      await apiClient.put("/users/profile", {
         averageCycleLength: Number(cycleLength),
         averagePeriodLength: Number(periodLength),
         lastPeriodDate: startDate,
       });
 
+      /*
+       * 2. Log the most recent period.
+       *    End date is worked out from the usual period length.
+       */
+      const end = new Date(startDate);
+      end.setDate(end.getDate() + Number(periodLength) - 1);
+      const endDate = end.toISOString().slice(0, 10);
+
+      await apiClient.post("/cycles", {
+        startDate,
+        endDate,
+      });
+
       navigate("/period-tracker");
-    } catch (error: unknown) {
+    } catch (err: unknown) {
       const message =
-        (error as { response?: { data?: { message?: string } } }).response?.data?.message ||
+        (err as { response?: { data?: { message?: string } } }).response?.data?.message ||
         "Could not save cycle setup.";
       setError(message);
     } finally {
@@ -83,6 +94,7 @@ function CycleSetup() {
               id="startDate"
               type="date"
               value={startDate}
+              max={new Date().toISOString().slice(0, 10)}
               onChange={(event) => setStartDate(event.target.value)}
               required
               className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-700 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
@@ -106,17 +118,15 @@ function CycleSetup() {
               <input
                 id="cycleLength"
                 type="number"
-                min="1"
-                max="100"
+                min="15"
+                max="60"
                 value={cycleLength}
                 onChange={(event) => setCycleLength(event.target.value)}
                 required
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-700 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
               />
 
-              <span className="text-sm text-gray-500">
-                days
-              </span>
+              <span className="text-sm text-gray-500">days</span>
             </div>
 
             <p className="mt-2 text-xs text-gray-400">
@@ -138,20 +148,18 @@ function CycleSetup() {
                 id="periodLength"
                 type="number"
                 min="1"
-                max="20"
+                max="15"
                 value={periodLength}
                 onChange={(event) => setPeriodLength(event.target.value)}
                 required
                 className="w-full rounded-xl border border-gray-200 bg-gray-50 px-4 py-3 text-gray-700 outline-none focus:border-pink-500 focus:ring-2 focus:ring-pink-100"
               />
 
-              <span className="text-sm text-gray-500">
-                days
-              </span>
+              <span className="text-sm text-gray-500">days</span>
             </div>
           </div>
 
-           {error && (
+          {error && (
             <div className="mb-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
               {error}
             </div>

@@ -19,12 +19,16 @@ interface CycleData {
   predictedOvulation: string;
 }
 
-interface CycleResponse {
+/*
+ * Shape of GET /api/cycles/current → data
+ * (null when the user hasn't logged a period yet)
+ */
+interface CurrentCycleData {
   cycle: {
     startDate: string;
-    endDate?: string;
-    periodLength?: number;
-    cycleLength?: number;
+    endDate?: string | null;
+    periodLength?: number | null;
+    cycleLength?: number | null;
     predictedNextStart: string;
     fertileWindowStart: string;
     fertileWindowEnd: string;
@@ -47,10 +51,15 @@ function PeriodDashboard() {
   useEffect(() => {
     const fetchCycle = async () => {
       try {
-        const response =
-          await apiClient.get<CycleResponse>("/cycles/current");
+        const response = await apiClient.get("/cycles/current");
 
-        const d = response.data;
+        // Backend wraps everything in { success, message, data }
+        const d: CurrentCycleData | null = response.data?.data ?? null;
+
+        if (!d || !d.cycle) {
+          setCycle(null);
+          return;
+        }
 
         setCycle({
           startDate: d.cycle.startDate,
@@ -68,7 +77,7 @@ function PeriodDashboard() {
           predictedOvulation: d.cycle.predictedOvulation,
         });
       } catch {
-        // No cycle data yet
+        setCycle(null);
       } finally {
         setLoading(false);
       }
@@ -110,6 +119,7 @@ function PeriodDashboard() {
 
           <button
             type="button"
+            onClick={() => navigate("/notifications")}
             className="rounded-full bg-pink-50 p-3 text-lg"
             aria-label="Notifications"
           >
@@ -132,6 +142,12 @@ function PeriodDashboard() {
                   ? `Day ${cycleDay}`
                   : "Set up your cycle"}
               </h2>
+
+              {showCycleData && (
+                <p className="mt-1 text-sm capitalize opacity-80">
+                  {cycle.phase} phase
+                </p>
+              )}
             </div>
 
             <div className="flex h-20 w-20 items-center justify-center rounded-full bg-white/20">
@@ -145,13 +161,25 @@ function PeriodDashboard() {
             </p>
 
             <p className="mt-1 text-lg font-semibold">
-              {daysUntilPeriod !== null
-                ? daysUntilPeriod === 0
-                  ? "Due today"
-                  : `In ${daysUntilPeriod} days`
-                : "Complete your cycle setup"}
+              {!showCycleData
+                ? "Complete your cycle setup"
+                : cycle.isLate
+                ? `${Math.abs(cycle.daysUntilNextPeriod)} days late`
+                : daysUntilPeriod === 0
+                ? "Due today"
+                : `In ${daysUntilPeriod} days`}
             </p>
           </div>
+
+          {!showCycleData && (
+            <button
+              type="button"
+              onClick={() => navigate("/period-tracker/setup")}
+              className="mt-4 w-full rounded-xl bg-white py-3 text-sm font-semibold text-pink-600 transition hover:bg-pink-50"
+            >
+              Set up now
+            </button>
+          )}
         </section>
 
         {/* Today's Check-in */}
@@ -179,14 +207,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-pink-100">
                 🩸
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Flow
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Log your flow
-              </p>
+              <h3 className="font-semibold text-gray-900">Flow</h3>
+              <p className="mt-1 text-sm text-gray-500">Log your flow</p>
             </button>
 
             <button
@@ -197,14 +219,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-purple-100">
                 📝
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Symptoms
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                How are you feeling?
-              </p>
+              <h3 className="font-semibold text-gray-900">Symptoms</h3>
+              <p className="mt-1 text-sm text-gray-500">How are you feeling?</p>
             </button>
 
             <button
@@ -215,14 +231,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-yellow-100">
                 😊
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Mood
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Track your mood
-              </p>
+              <h3 className="font-semibold text-gray-900">Mood</h3>
+              <p className="mt-1 text-sm text-gray-500">Track your mood</p>
             </button>
 
             <button
@@ -233,14 +243,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
                 🌿
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Stress
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Check your stress
-              </p>
+              <h3 className="font-semibold text-gray-900">Stress</h3>
+              <p className="mt-1 text-sm text-gray-500">Check your stress</p>
             </button>
 
             <button
@@ -251,14 +255,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-blue-100">
                 💊
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Medication
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Track medication
-              </p>
+              <h3 className="font-semibold text-gray-900">Medication</h3>
+              <p className="mt-1 text-sm text-gray-500">Track medication</p>
             </button>
 
             <button
@@ -269,14 +267,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-green-100">
                 🍎
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Nutrition
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Log your meals
-              </p>
+              <h3 className="font-semibold text-gray-900">Nutrition</h3>
+              <p className="mt-1 text-sm text-gray-500">Log your meals</p>
             </button>
 
             <button
@@ -287,14 +279,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-teal-100">
                 🌿
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                Wellness
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Hydration & movement
-              </p>
+              <h3 className="font-semibold text-gray-900">Wellness</h3>
+              <p className="mt-1 text-sm text-gray-500">Hydration & movement</p>
             </button>
 
             <button
@@ -305,14 +291,8 @@ function PeriodDashboard() {
               <div className="mb-3 flex h-10 w-10 items-center justify-center rounded-full bg-rose-100">
                 📖
               </div>
-
-              <h3 className="font-semibold text-gray-900">
-                My Notes
-              </h3>
-
-              <p className="mt-1 text-sm text-gray-500">
-                Write down your thoughts
-              </p>
+              <h3 className="font-semibold text-gray-900">My Notes</h3>
+              <p className="mt-1 text-sm text-gray-500">Write down your thoughts</p>
             </button>
           </div>
         </section>
@@ -330,15 +310,11 @@ function PeriodDashboard() {
         <section className="rounded-3xl bg-white p-5 shadow-sm">
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="font-bold text-gray-900">
-                Your insights 📊
-              </h2>
-
+              <h2 className="font-bold text-gray-900">Your insights 📊</h2>
               <p className="mt-1 text-sm text-gray-500">
                 Understand your cycle better
               </p>
             </div>
-
             <span className="text-2xl">✨</span>
           </div>
 
@@ -366,12 +342,8 @@ function PeriodDashboard() {
               <div className="flex h-12 w-12 items-center justify-center rounded-full bg-purple-100 text-2xl">
                 🤝
               </div>
-
               <div>
-                <h2 className="font-bold text-gray-900">
-                  Partner Sharing
-                </h2>
-
+                <h2 className="font-bold text-gray-900">Partner Sharing</h2>
                 <p className="mt-1 text-sm text-gray-500">
                   Share selected cycle updates
                 </p>
@@ -389,9 +361,7 @@ function PeriodDashboard() {
 
           <button
             type="button"
-            onClick={() =>
-              navigate("/period-tracker/partner-sharing")
-            }
+            onClick={() => navigate("/period-tracker/partner-sharing")}
             className="mt-4 w-full rounded-xl border border-purple-200 bg-white py-3 text-sm font-semibold text-purple-600 transition hover:bg-purple-50"
           >
             Manage Partner Sharing

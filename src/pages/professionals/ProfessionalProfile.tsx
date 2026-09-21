@@ -1,456 +1,172 @@
+import { useEffect, useState } from "react";
 import { Link, useParams } from "react-router-dom";
-
-interface Professional {
-  id: number;
-  name: string;
-  specialty: string;
-  location: string;
-  experience: string;
-  availability: string;
-  verified: boolean;
-  qualifications: string[];
-  about: string;
-  consultationTypes: string[];
-}
-
-const professionals: Professional[] = [
-  {
-    id: 1,
-    name: "Dr. Ama Mensah",
-    specialty: "Obstetrician & Gynaecologist",
-    location: "Accra, Ghana",
-    experience: "8 years experience",
-    availability: "Available for consultation",
-    verified: true,
-    qualifications: [
-      "MBChB",
-      "Membership in Obstetrics & Gynaecology",
-      "Women's Health Specialist",
-    ],
-    about:
-      "Dr. Ama Mensah provides care and guidance relating to reproductive health, pregnancy, menstrual health and women's wellbeing.",
-    consultationTypes: [
-      "General Women's Health",
-      "Pregnancy Care",
-      "Menstrual Health",
-    ],
-  },
-  {
-    id: 2,
-    name: "Dr. Efua Owusu",
-    specialty: "Women's Health Specialist",
-    location: "Kumasi, Ghana",
-    experience: "6 years experience",
-    availability: "Available this week",
-    verified: true,
-    qualifications: [
-      "MBChB",
-      "Women's Health Certification",
-      "Reproductive Health Specialist",
-    ],
-    about:
-      "Dr. Efua Owusu focuses on women's health and reproductive wellbeing, providing education and professional guidance.",
-    consultationTypes: [
-      "Women's Health",
-      "Reproductive Health",
-      "Wellbeing",
-    ],
-  },
-  {
-    id: 3,
-    name: "Dr. Abena Boateng",
-    specialty: "Fertility Specialist",
-    location: "Accra, Ghana",
-    experience: "10 years experience",
-    availability: "Available for consultation",
-    verified: true,
-    qualifications: [
-      "MBChB",
-      "Fertility Medicine Certification",
-      "Reproductive Health Specialist",
-    ],
-    about:
-      "Dr. Abena Boateng provides professional guidance relating to fertility and reproductive health.",
-    consultationTypes: [
-      "Fertility",
-      "Reproductive Health",
-      "Conception Planning",
-    ],
-  },
-  {
-    id: 4,
-    name: "Dr. Akosua Asante",
-    specialty: "Midwife",
-    location: "Tema, Ghana",
-    experience: "7 years experience",
-    availability: "Available this week",
-    verified: true,
-    qualifications: [
-      "Registered Midwife",
-      "Maternal Health Certification",
-      "Pregnancy Care Specialist",
-    ],
-    about:
-      "Dr. Akosua Asante supports women through pregnancy, maternal health education and preparation for childbirth.",
-    consultationTypes: [
-      "Pregnancy Care",
-      "Maternal Health",
-      "Birth Preparation",
-    ],
-  },
-  {
-    id: 5,
-    name: "Dr. Adwoa Owusu",
-    specialty: "Psychologist",
-    location: "Accra, Ghana",
-    experience: "7 years experience",
-    availability: "Available for consultation",
-    verified: true,
-    qualifications: [
-      "Psychology Degree",
-      "Professional Psychology Certification",
-      "Mental Wellbeing Specialist",
-    ],
-    about:
-      "Dr. Adwoa Owusu provides professional psychological support and wellbeing-focused guidance for women.",
-    consultationTypes: [
-      "Mental Wellbeing",
-      "Stress Management",
-      "Emotional Support",
-    ],
-  },
-  {
-    id: 6,
-    name: "Dr. Yaa Asante",
-    specialty: "Nutritionist / Dietitian",
-    location: "Kumasi, Ghana",
-    experience: "6 years experience",
-    availability: "Available this week",
-    verified: true,
-    qualifications: [
-      "Nutrition and Dietetics Certification",
-      "Registered Dietitian",
-      "Women's Nutrition Specialist",
-    ],
-    about:
-      "Dr. Yaa Asante provides nutrition and dietary guidance supporting women's health and wellbeing.",
-    consultationTypes: [
-      "Women's Nutrition",
-      "Healthy Eating",
-      "Pregnancy Nutrition",
-    ],
-  },
-  {
-    id: 7,
-    name: "Dr. Mabel Addo",
-    specialty: "Reproductive Health Specialist",
-    location: "Accra, Ghana",
-    experience: "9 years experience",
-    availability: "Available for consultation",
-    verified: true,
-    qualifications: [
-      "MBChB",
-      "Reproductive Health Certification",
-      "Women's Health Specialist",
-    ],
-    about:
-      "Dr. Mabel Addo focuses on reproductive health education, women's health and reproductive wellbeing.",
-    consultationTypes: [
-      "Reproductive Health",
-      "Menstrual Health",
-      "Sexual Health Education",
-    ],
-  },
-  {
-    id: 8,
-    name: "Dr. Kofi Mensah",
-    specialty: "General Practitioner",
-    location: "Tema, Ghana",
-    experience: "8 years experience",
-    availability: "Available this week",
-    verified: true,
-    qualifications: [
-      "MBChB",
-      "General Medical Practice Certification",
-      "Primary Care Experience",
-    ],
-    about:
-      "Dr. Kofi Mensah provides general medical care and can help users understand common health concerns and appropriate next steps.",
-    consultationTypes: [
-      "General Health",
-      "Primary Care",
-      "Health Guidance",
-    ],
-  },
-  {
-    id: 9,
-    name: "Dr. Linda Boateng",
-    specialty: "Paediatrician",
-    location: "Accra, Ghana",
-    experience: "11 years experience",
-    availability: "Available for consultation",
-    verified: true,
-    qualifications: [
-      "MBChB",
-      "Paediatrics Certification",
-      "Child Health Specialist",
-    ],
-    about:
-      "Dr. Linda Boateng provides professional guidance relating to children's health and development.",
-    consultationTypes: [
-      "Child Health",
-      "Child Development",
-      "Maternal & Child Health",
-    ],
-  },
-  {
-    id: 10,
-    name: "Dr. Akua Frimpong",
-    specialty: "Maternal & Child Health Specialist",
-    location: "Cape Coast, Ghana",
-    experience: "8 years experience",
-    availability: "Available this week",
-    verified: true,
-    qualifications: [
-      "MBChB",
-      "Maternal & Child Health Certification",
-      "Family Health Specialist",
-    ],
-    about:
-      "Dr. Akua Frimpong focuses on maternal and child health, providing education and professional guidance across the pregnancy and family health journey.",
-    consultationTypes: [
-      "Maternal Health",
-      "Child Health",
-      "Family Health",
-    ],
-  },
-];
+import {
+  getProfessional,
+  specialtyIcon,
+  locationText,
+  experienceText,
+  availabilityText,
+  type Professional,
+} from "../../api/professionalApi";
 
 function ProfessionalProfile() {
   const { id } = useParams();
 
-  const professional = professionals.find(
-    (item) => item.id === Number(id)
-  );
+  const [professional, setProfessional] = useState<Professional | null>(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const load = async () => {
+      if (!id) return;
+      try {
+        setProfessional(await getProfessional(id));
+      } catch {
+        setProfessional(null);
+      } finally {
+        setLoading(false);
+      }
+    };
+    load();
+  }, [id]);
+
+  if (loading) {
+    return (
+      <div className="flex min-h-screen items-center justify-center bg-gray-50">
+        <div className="h-8 w-8 animate-spin rounded-full border-4 border-pink-200 border-t-pink-600"></div>
+      </div>
+    );
+  }
 
   if (!professional) {
     return (
       <div className="min-h-screen bg-gray-50 px-6 py-16">
         <div className="mx-auto max-w-3xl text-center">
-
-          <div className="text-5xl">
-            👩🏾‍⚕️
-          </div>
-
-          <h1 className="mt-4 text-3xl font-bold text-gray-900">
-            Professional Not Found
-          </h1>
-
-          <p className="mt-3 text-gray-600">
-            We could not find the healthcare professional
-            you are looking for.
-          </p>
-
+          <div className="text-5xl">👩🏾‍⚕️</div>
+          <h1 className="mt-4 text-3xl font-bold text-gray-900">Professional Not Found</h1>
+          <p className="mt-3 text-gray-600">We could not find the healthcare professional you are looking for.</p>
           <Link
             to="/healthcare-professionals"
             className="mt-6 inline-block rounded-lg bg-pink-600 px-5 py-3 font-semibold text-white transition hover:bg-pink-700"
           >
             Find a Professional
           </Link>
-
         </div>
       </div>
     );
   }
 
-  const profileIcon =
-    professional.specialty === "Psychologist"
-      ? "🧠"
-      : professional.specialty === "Nutritionist / Dietitian"
-      ? "🥗"
-      : professional.specialty === "Paediatrician"
-      ? "👶"
-      : professional.specialty === "Midwife"
-      ? "🤱🏾"
-      : "👩🏾‍⚕️";
+  const fee = Number(professional.consultationFee) || 0;
 
   return (
     <div className="min-h-screen bg-gray-50 px-6 py-10">
       <div className="mx-auto max-w-5xl">
 
-        {/* Back */}
-        <Link
-          to="/healthcare-professionals"
-          className="text-sm font-semibold text-pink-600 hover:text-pink-700"
-        >
+        <Link to="/healthcare-professionals" className="text-sm font-semibold text-pink-600 hover:text-pink-700">
           ← Back to Professionals
         </Link>
 
         {/* Profile Header */}
         <div className="mt-8 rounded-2xl bg-white p-8 shadow-sm">
-
           <div className="flex flex-col gap-6 md:flex-row md:items-start">
-
-            {/* Profile Image */}
-            <div className="flex h-28 w-28 shrink-0 items-center justify-center rounded-full bg-pink-50 text-6xl">
-              {profileIcon}
+            <div className="flex h-28 w-28 shrink-0 items-center justify-center overflow-hidden rounded-full bg-pink-50 text-6xl">
+              {professional.avatarUrl ? (
+                <img src={professional.avatarUrl} alt={professional.name} className="h-full w-full object-cover" />
+              ) : (
+                specialtyIcon(professional.specialty)
+              )}
             </div>
 
-            {/* Main Details */}
             <div className="flex-1">
-
               <div className="flex flex-wrap items-center gap-3">
-
-                <h1 className="text-3xl font-bold text-gray-900">
-                  {professional.name}
-                </h1>
-
-                {professional.verified && (
+                <h1 className="text-3xl font-bold text-gray-900">{professional.name}</h1>
+                {professional.isVerified && (
                   <span className="rounded-full bg-green-50 px-3 py-1 text-xs font-semibold text-green-700">
                     ✓ Verified Professional
                   </span>
                 )}
-
               </div>
 
-              <p className="mt-2 text-lg font-semibold text-pink-600">
-                {professional.specialty}
-              </p>
+              <p className="mt-2 text-lg font-semibold text-pink-600">{professional.specialty}</p>
 
               <div className="mt-4 space-y-2 text-sm text-gray-600">
-
-                <p>
-                  📍 {professional.location}
+                <p>📍 {locationText(professional)}</p>
+                <p>🩺 {experienceText(professional)}</p>
+                {professional.hospital && <p>🏥 {professional.hospital}</p>}
+                {professional.languages.length > 0 && <p>🗣️ {professional.languages.join(", ")}</p>}
+                <p>💳 {fee > 0 ? `GHS ${fee.toFixed(2)} per consultation` : "Free consultation"}</p>
+                <p className={`font-semibold ${professional.isAvailable ? "text-green-600" : "text-gray-400"}`}>
+                  ● {availabilityText(professional)}
                 </p>
-
-                <p>
-                  🩺 {professional.experience}
-                </p>
-
-                <p className="font-semibold text-green-600">
-                  ● {professional.availability}
-                </p>
-
               </div>
-
             </div>
-
           </div>
 
           {/* Actions */}
           <div className="mt-8 flex flex-col gap-3 sm:flex-row">
-
+            {professional.acceptsChat && (
+              <Link
+                to={`/healthcare-professionals/${professional.id}/chat`}
+                className="flex-1 rounded-lg bg-pink-600 px-5 py-3 text-center font-semibold text-white transition hover:bg-pink-700"
+              >
+                💬 Start Consultation Chat
+              </Link>
+            )}
             <Link
-              to={`/healthcare-professionals/${professional.id}/chat`}
-              className="flex-1 rounded-lg bg-pink-600 px-5 py-3 text-center font-semibold text-white transition hover:bg-pink-700"
-            >
-              💬 Start Consultation Chat
-            </Link>
-
-            <Link
-              to="/appointments/book"
+              to={`/appointments/book?professionalId=${professional.id}`}
               className="flex-1 rounded-lg border border-pink-600 px-5 py-3 text-center font-semibold text-pink-600 transition hover:bg-pink-50"
             >
               📅 Book an Appointment
             </Link>
-
           </div>
-
         </div>
 
         {/* Profile Information */}
         <div className="mt-6 grid gap-6 md:grid-cols-2">
-
-          {/* About */}
           <section className="rounded-2xl bg-white p-6 shadow-sm">
-
-            <h2 className="text-xl font-bold text-gray-900">
-              About
-            </h2>
-
-            <p className="mt-3 leading-7 text-gray-600">
-              {professional.about}
-            </p>
-
+            <h2 className="text-xl font-bold text-gray-900">About</h2>
+            <p className="mt-3 leading-7 text-gray-600">{professional.bio || "No description provided yet."}</p>
           </section>
 
-          {/* Qualifications */}
           <section className="rounded-2xl bg-white p-6 shadow-sm">
-
-            <h2 className="text-xl font-bold text-gray-900">
-              Qualifications
-            </h2>
-
-            <ul className="mt-4 space-y-3">
-
-              {professional.qualifications.map(
-                (qualification) => (
-                  <li
-                    key={qualification}
-                    className="flex items-start gap-3 text-sm text-gray-600"
-                  >
-                    <span className="mt-0.5 text-pink-600">
-                      ✓
-                    </span>
-
-                    <span>
-                      {qualification}
-                    </span>
+            <h2 className="text-xl font-bold text-gray-900">Qualifications</h2>
+            {professional.qualifications.length > 0 ? (
+              <ul className="mt-4 space-y-3">
+                {professional.qualifications.map((q) => (
+                  <li key={q} className="flex items-start gap-3 text-sm text-gray-600">
+                    <span className="mt-0.5 text-pink-600">✓</span>
+                    <span>{q}</span>
                   </li>
-                )
-              )}
-
-            </ul>
-
+                ))}
+              </ul>
+            ) : (
+              <p className="mt-3 text-sm text-gray-500">No qualifications listed yet.</p>
+            )}
           </section>
-
         </div>
 
         {/* Consultation Areas */}
-        <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
-
-          <h2 className="text-xl font-bold text-gray-900">
-            Consultation Areas
-          </h2>
-
-          <p className="mt-2 text-sm text-gray-600">
-            Areas this professional can provide guidance
-            and consultation for.
-          </p>
-
-          <div className="mt-5 flex flex-wrap gap-3">
-
-            {professional.consultationTypes.map(
-              (type) => (
-                <span
-                  key={type}
-                  className="rounded-full bg-pink-50 px-4 py-2 text-sm font-semibold text-pink-600"
-                >
-                  {type}
+        {professional.consultationAreas.length > 0 && (
+          <section className="mt-6 rounded-2xl bg-white p-6 shadow-sm">
+            <h2 className="text-xl font-bold text-gray-900">Consultation Areas</h2>
+            <p className="mt-2 text-sm text-gray-600">Areas this professional can provide guidance and consultation for.</p>
+            <div className="mt-5 flex flex-wrap gap-3">
+              {professional.consultationAreas.map((area) => (
+                <span key={area} className="rounded-full bg-pink-50 px-4 py-2 text-sm font-semibold text-pink-600">
+                  {area}
                 </span>
-              )
-            )}
-
-          </div>
-
-        </section>
+              ))}
+            </div>
+          </section>
+        )}
 
         {/* Important Notice */}
         <div className="mt-6 rounded-2xl border border-pink-100 bg-pink-50 p-6">
-
-          <h2 className="font-bold text-gray-900">
-            Important
-          </h2>
-
+          <h2 className="font-bold text-gray-900">Important</h2>
           <p className="mt-2 text-sm leading-6 text-gray-600">
-            Professional profiles and verification details
-            will eventually be managed through HerBloom's
-            backend and healthcare professional system.
-            This page currently uses demonstration data.
+            This professional has been verified by HerBloom. Consultations through HerBloom do not replace
+            emergency care — if you need urgent help, use Emergency Assistance.
           </p>
-
         </div>
-
       </div>
     </div>
   );
