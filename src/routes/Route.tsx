@@ -93,6 +93,14 @@ import PremiumFeatures from "../pages/premium/PremiumFeatures";
 import PremiumStatus from "../pages/premium/PremiumStatus";
 import PaymentCallback from "../pages/premium/PaymentCallback";
 
+// Admin
+import AdminLayout from "../pages/admin/AdminLayout";
+import AdminDashboard from "../pages/admin/AdminDashboard";
+import AdminUsers from "../pages/admin/AdminUsers";
+import AdminProfessionals from "../pages/admin/AdminProfessionals";
+import AdminMessages from "../pages/admin/AdminMessages";
+import AdminPayments from "../pages/admin/AdminPayments";
+
 function AppRoutes() {
   return (
     <BrowserRouter>
@@ -204,6 +212,15 @@ function AppRoutes() {
 
             {/* PAYMENT CALLBACK */}
             <Route path="/payment/callback" element={<PaymentCallback />} />
+
+            {/* ADMIN — the panel checks the role itself and blocks non-admins */}
+            <Route path="/admin" element={<AdminLayout />}>
+              <Route index element={<AdminDashboard />} />
+              <Route path="users" element={<AdminUsers />} />
+              <Route path="professionals" element={<AdminProfessionals />} />
+              <Route path="messages" element={<AdminMessages />} />
+              <Route path="payments" element={<AdminPayments />} />
+            </Route>
 
           </Route>
         </Route>
