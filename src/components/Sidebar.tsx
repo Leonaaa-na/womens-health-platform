@@ -9,14 +9,33 @@ function Sidebar() {
   const { logout } = useAuth();
 
   const [isAdmin, setIsAdmin] = useState(false);
+  const [isProfessional, setIsProfessional] = useState(false);
+  const [pending, setPending] = useState(0);
 
-  // Ask the backend whether this account is an admin
+  // Ask the backend what this account is
   useEffect(() => {
     apiClient
       .get("/users/me")
-      .then((res) => setIsAdmin(res.data.data?.role === "admin"))
-      .catch(() => setIsAdmin(false));
+      .then((res) => {
+        const role = res.data.data?.role;
+        setIsAdmin(role === "admin");
+        setIsProfessional(role === "professional");
+      })
+      .catch(() => undefined);
   }, []);
+
+  // Doctors see how many requests are waiting
+  useEffect(() => {
+    if (!isProfessional) return;
+    const load = () =>
+      apiClient
+        .get("/appointments/professional/pending-count")
+        .then((res) => setPending(res.data.data?.pending || 0))
+        .catch(() => undefined);
+    load();
+    const timer = setInterval(load, 60000); // refresh every minute
+    return () => clearInterval(timer);
+  }, [isProfessional, location.pathname]);
 
   const isActive = (path: string) => location.pathname === path;
 
@@ -43,6 +62,27 @@ function Sidebar() {
 
       {/* Navigation */}
       <nav className="min-h-0 flex-1 space-y-2 overflow-y-auto px-4 py-6">
+
+        {/* Doctors first — it's what they're here for */}
+        {isProfessional ? (
+          <>
+            <Link
+              to="/doctor/appointments"
+              className={`flex items-center gap-3 rounded-xl px-4 py-3 text-sm font-semibold transition ${
+                location.pathname.startsWith("/doctor")
+                  ? "bg-purple-600 text-white shadow-md"
+                  : "bg-white/60 text-gray-700 hover:bg-white/90 hover:text-purple-700"
+              }`}
+            >
+              <span className="text-lg">🩺</span>
+              <span className="flex-1">My Appointments</span>
+              {pending > 0 ? (
+                <span className="rounded-full bg-red-500 px-2 py-0.5 text-xs font-bold text-white">{pending}</span>
+              ) : null}
+            </Link>
+            <div className="!mb-3 !mt-3 border-t border-pink-200"></div>
+          </>
+        ) : null}
 
         <Link to="/period-tracker" className={linkClass(isActive("/period-tracker"))}>
           <span className="text-lg">🩸</span>

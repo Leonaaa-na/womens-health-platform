@@ -53,6 +53,7 @@ import HealthSaved from "../pages/health/HealthSaved";
 import FindProfessional from "../pages/professionals/FindProfessional";
 import ProfessionalProfile from "../pages/professionals/ProfessionalProfile";
 import ConsultationChat from "../pages/professionals/ConsultationChat";
+import DoctorAppointments from "../pages/professionals/DoctorAppointments";
 
 // Emergency Assistance
 import EmergencyHome from "../pages/emergency/EmergencyHome";
@@ -97,6 +98,7 @@ import PaymentCallback from "../pages/premium/PaymentCallback";
 import AdminLayout from "../pages/admin/AdminLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminUsers from "../pages/admin/AdminUsers";
+import AdminAppointments from "../pages/admin/AdminAppointments";
 import AdminProfessionals from "../pages/admin/AdminProfessionals";
 import AdminMessages from "../pages/admin/AdminMessages";
 import AdminPayments from "../pages/admin/AdminPayments";
@@ -172,6 +174,9 @@ function AppRoutes() {
             <Route path="/healthcare-professionals/:id" element={<ProfessionalProfile />} />
             <Route path="/healthcare-professionals/:id/chat" element={<ConsultationChat />} />
 
+            {/* DOCTOR — the page checks the role itself */}
+            <Route path="/doctor/appointments" element={<DoctorAppointments />} />
+
             {/* EMERGENCY ASSISTANCE */}
             <Route path="/emergency" element={<EmergencyHome />} />
             <Route path="/emergency/contacts" element={<EmergencyContacts />} />
@@ -217,6 +222,7 @@ function AppRoutes() {
             <Route path="/admin" element={<AdminLayout />}>
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
+              <Route path="appointments" element={<AdminAppointments />} />
               <Route path="professionals" element={<AdminProfessionals />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="payments" element={<AdminPayments />} />

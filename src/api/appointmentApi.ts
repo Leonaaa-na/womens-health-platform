@@ -1,11 +1,11 @@
 import apiClient from "./client";
 
-export type BackendStatus = "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled";
-export type UiStatus = "Upcoming" | "Completed" | "Cancelled" | "Missed";
+export type BackendStatus = "pending" | "confirmed" | "completed" | "cancelled" | "rescheduled" | "declined";
+export type UiStatus = "Upcoming" | "Completed" | "Cancelled" | "Missed" | "Declined";
 
 export interface AppointmentHistoryItem {
   id: string;
-  action: "booked" | "confirmed" | "rescheduled" | "cancelled" | "completed";
+  action: "booked" | "confirmed" | "rescheduled" | "cancelled" | "completed" | "declined";
   previousScheduledAt: string | null;
   newScheduledAt: string | null;
   reason: string | null;
@@ -26,6 +26,7 @@ export interface Appointment {
   location: string | null;
   notes: string | null;
   cancellationReason: string | null;
+  declineReason: string | null;
   professional: {
     id: string;
     name: string;
@@ -33,6 +34,7 @@ export interface Appointment {
     hospital: string | null;
     city: string | null;
   } | null;
+  patient?: { id: string; name: string; email: string; phone: string | null };
   history?: AppointmentHistoryItem[];
   createdAt: string;
 }
@@ -71,7 +73,7 @@ export const toDateInput = (iso: string) => {
 
 const toScheduledAt = (date: string, time: string) => `${date}T${to24h(time)}:00`;
 
-// ---------- API calls (return just `data`) ----------
+// ---------- Patient ----------
 
 export const getMyAppointments = async (): Promise<Appointment[]> =>
   (await apiClient.get("/appointments", { params: { status: "all" } })).data.data;
@@ -108,11 +110,40 @@ export const getBookedSlots = async (professionalId: string, date: string): Prom
   return (data.booked || []).map((b: { scheduledAt: string }) => toSlotLabel(b.scheduledAt));
 };
 
+// ---------- Professional ----------
+
+// status: pending | confirmed | upcoming | past | all
+export const getProfessionalAppointments = async (status = "upcoming"): Promise<Appointment[]> =>
+  (await apiClient.get("/appointments/professional", { params: { status } })).data.data;
+
+export const getPendingCount = async (): Promise<number> =>
+  (await apiClient.get("/appointments/professional/pending-count")).data.data.pending;
+
+export const confirmAppointment = async (id: string): Promise<Appointment> =>
+  (await apiClient.put(`/appointments/${id}/confirm`)).data.data;
+
+export const declineAppointment = async (id: string, reason: string): Promise<Appointment> =>
+  (await apiClient.put(`/appointments/${id}/decline`, { reason: reason || undefined })).data.data;
+
+export const completeAppointment = async (id: string, notes?: string): Promise<Appointment> =>
+  (await apiClient.put(`/appointments/${id}/complete`, { notes })).data.data;
+
+// ---------- Admin (read-only) ----------
+
+export const getAllAppointments = async (params: { status?: string; page?: number } = {}) =>
+  (await apiClient.get("/appointments/admin/all", { params })).data.data as {
+    appointments: Appointment[];
+    total: number;
+    page: number;
+    pages: number;
+  };
+
 // ---------- Display helpers ----------
 
 export const uiStatus = (a: Appointment): UiStatus => {
   if (a.status === "completed") return "Completed";
   if (a.status === "cancelled") return "Cancelled";
+  if (a.status === "declined") return "Declined";
   return new Date(a.scheduledAt) < new Date() ? "Missed" : "Upcoming";
 };
 
@@ -129,6 +160,9 @@ export const consultationLabel = (a: Appointment) => {
 export const isAwaitingConfirmation = (a: Appointment) =>
   uiStatus(a) === "Upcoming" && (a.status === "pending" || a.status === "rescheduled");
 
+// Declined appointments stay in the patient's list until they pick a new time
+export const needsNewTime = (a: Appointment) => a.status === "declined";
+
 export const formatDate = (iso: string, style: "short" | "long" = "short") =>
   new Date(iso).toLocaleDateString("en-GB", {
     ...(style === "long" ? { weekday: "long" } : {}),
@@ -142,9 +176,11 @@ export const statusStyle = (status: UiStatus) =>
     ? "bg-pink-100 text-pink-700"
     : status === "Completed"
     ? "bg-green-100 text-green-700"
+    : status === "Declined"
+    ? "bg-orange-100 text-orange-700"
     : status === "Cancelled"
     ? "bg-gray-100 text-gray-600"
-    : "bg-orange-100 text-orange-700";
+    : "bg-yellow-100 text-yellow-700";
 
 export const apiErrorMessage = (error: unknown, fallback: string) =>
   (error as { response?: { data?: { message?: string } } }).response?.data?.message || fallback;
