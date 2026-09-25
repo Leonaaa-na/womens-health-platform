@@ -7,6 +7,16 @@ import {
   DEFAULT_SETTINGS,
   type NotificationSettings as Settings,
 } from "../../api/reminderApi";
+import {
+  pushSupported,
+  permission as pushPermission,
+  isSubscribed,
+  enablePush,
+  disablePush,
+  sendTestPush,
+  isIos,
+  isInstalled,
+} from "../../api/pushApi";
 
 const TYPE_TOGGLES: { key: keyof Settings; icon: string; title: string; description: string }[] = [
   { key: "periodNotifications", icon: "🩸", title: "Period Reminders", description: "Expected period and cycle reminders." },
@@ -35,7 +45,11 @@ function NotificationSettings() {
   const [settings, setSettings] = useState<Settings>(DEFAULT_SETTINGS);
   const [loading, setLoading] = useState(true);
   const [message, setMessage] = useState("");
-  const [permission, setPermission] = useState<NotificationPermission | "unsupported">("unsupported");
+
+  // Push state for THIS device
+  const [subscribed, setSubscribed] = useState(false);
+  const [pushBusy, setPushBusy] = useState(false);
+  const [pushMessage, setPushMessage] = useState("");
 
   useEffect(() => {
     const load = async () => {
@@ -48,7 +62,7 @@ function NotificationSettings() {
       }
     };
     load();
-    if ("Notification" in window) setPermission(Notification.permission);
+    isSubscribed().then(setSubscribed);
   }, []);
 
   // Save each change straight away; undo it if the server says no
@@ -64,17 +78,23 @@ function NotificationSettings() {
     }
   };
 
-  const requestNotificationPermission = async () => {
-    if (!("Notification" in window)) {
-      setMessage("Your current browser does not support device notifications.");
-      return;
-    }
+  const togglePush = async () => {
+    setPushBusy(true);
+    setPushMessage("");
+    const result = subscribed ? await disablePush() : await enablePush();
+    setPushMessage(result.message);
+    setSubscribed(await isSubscribed());
+    setPushBusy(false);
+  };
+
+  const testPush = async () => {
+    setPushBusy(true);
     try {
-      const result = await Notification.requestPermission();
-      setPermission(result);
-      if (result === "denied") setMessage("Notifications were blocked. You can enable them in your browser settings.");
-    } catch {
-      setMessage("Unable to request notification permission.");
+      setPushMessage(await sendTestPush());
+    } catch (error) {
+      setPushMessage(apiErrorMessage(error, "Could not send a test notification."));
+    } finally {
+      setPushBusy(false);
     }
   };
 
@@ -100,6 +120,8 @@ function NotificationSettings() {
   }
 
   const off = !settings.notificationsEnabled;
+  const perm = pushPermission();
+  const needsHomeScreen = isIos() && !isInstalled();
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-8">
@@ -122,32 +144,71 @@ function NotificationSettings() {
 
         {message ? <div className="mb-5 rounded-xl bg-pink-50 p-3 text-sm font-medium text-pink-700">{message}</div> : null}
 
-        {/* Device Notifications */}
+        {/* Push notifications */}
         <section className="mb-5 rounded-2xl bg-white p-5 shadow-md">
-          <h2 className="mb-1 text-lg font-bold text-gray-800">📱 Device Notifications</h2>
-          <p className="mb-4 text-sm text-gray-500">Allow this browser to show HerBloom notifications.</p>
-          <div className="flex items-center justify-between gap-4 rounded-xl bg-pink-50 p-4">
-            <div>
-              <p className="font-semibold text-gray-800">Browser Notifications</p>
-              <p className="mt-1 text-xs text-gray-500">
-                {permission === "granted"
-                  ? "Notifications are allowed on this device."
-                  : permission === "denied"
-                  ? "Notifications are currently blocked."
-                  : "Allow HerBloom to request notification permission."}
-              </p>
+          <h2 className="mb-1 text-lg font-bold text-gray-800">📲 Push Notifications</h2>
+          <p className="mb-4 text-sm text-gray-500">
+            Get reminders on this device even when HerBloom is closed, the way messaging apps do.
+          </p>
+
+          {!pushSupported() ? (
+            <div className="rounded-xl bg-gray-50 p-4 text-sm text-gray-600">
+              This browser doesn't support push notifications. Try Chrome or Edge.
             </div>
-            {permission === "granted" ? (
-              <span className="rounded-full bg-green-100 px-3 py-2 text-xs font-bold text-green-700">Enabled</span>
-            ) : (
-              <button
-                onClick={requestNotificationPermission}
-                className="rounded-xl bg-pink-500 px-4 py-2 text-sm font-semibold text-white hover:bg-pink-600"
+          ) : needsHomeScreen ? (
+            <div className="rounded-xl bg-yellow-50 p-4 text-sm text-yellow-800">
+              <p className="font-semibold">One step needed on iPhone</p>
+              <p className="mt-1">Tap <b>Share</b> → <b>Add to Home Screen</b>, then open HerBloom from your home screen and come back here.</p>
+            </div>
+          ) : (
+            <>
+              <div
+                className={`flex flex-wrap items-center justify-between gap-4 rounded-xl p-4 ${
+                  subscribed ? "bg-green-50" : "bg-pink-50"
+                }`}
               >
-                Enable
-              </button>
-            )}
-          </div>
+                <div>
+                  <p className="font-semibold text-gray-800">
+                    {subscribed ? "On for this device" : "Off for this device"}
+                  </p>
+                  <p className="mt-1 text-xs text-gray-500">
+                    {perm === "denied"
+                      ? "Notifications are blocked in your browser settings for this site."
+                      : subscribed
+                      ? "Reminders will pop up on this device."
+                      : "Turn on to get reminders without opening the app."}
+                  </p>
+                </div>
+                <button
+                  onClick={togglePush}
+                  disabled={pushBusy || perm === "denied"}
+                  className={`rounded-xl px-5 py-2.5 text-sm font-semibold text-white disabled:opacity-60 ${
+                    subscribed ? "bg-gray-500 hover:bg-gray-600" : "bg-pink-600 hover:bg-pink-700"
+                  }`}
+                >
+                  {pushBusy ? "Working..." : subscribed ? "Turn off" : "Turn on"}
+                </button>
+              </div>
+
+              {subscribed ? (
+                <button
+                  onClick={testPush}
+                  disabled={pushBusy}
+                  className="mt-3 w-full rounded-xl border border-pink-200 px-4 py-3 text-sm font-semibold text-pink-600 hover:bg-pink-50 disabled:opacity-60"
+                >
+                  Send a test notification
+                </button>
+              ) : null}
+
+              {pushMessage ? (
+                <p className="mt-3 rounded-xl bg-gray-50 p-3 text-sm text-gray-700">{pushMessage}</p>
+              ) : null}
+
+              <p className="mt-3 text-xs text-gray-400">
+                Each device is separate, so turn this on wherever you want reminders.
+              </p>
+            </>
+          )}
         </section>
 
         {/* Master switch */}
@@ -208,11 +269,7 @@ function NotificationSettings() {
                 <p className="font-semibold text-gray-800">📳 Vibration</p>
                 <p className="text-xs text-gray-500">Vibrate when a reminder arrives.</p>
               </div>
-              <Toggle
-                on={settings.vibration}
-                onClick={() => save({ vibration: !settings.vibration })}
-                label="Toggle vibration"
-              />
+              <Toggle on={settings.vibration} onClick={() => save({ vibration: !settings.vibration })} label="Toggle vibration" />
             </div>
             <div className="flex items-center justify-between gap-4">
               <div>
