@@ -7,6 +7,7 @@ import {
   professionalName,
   specialtyOf,
   consultationLabel,
+  needsNewTime,
   toSlotLabel,
   formatDate,
   apiErrorMessage,
@@ -60,7 +61,10 @@ function CancelAppointment() {
     );
   }
 
-  if (!appointment || uiStatus(appointment) !== "Upcoming") {
+  // Upcoming and declined appointments can both be dropped
+  const canCancel = appointment && ["Upcoming", "Declined"].includes(uiStatus(appointment));
+
+  if (!canCancel) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-8">
         <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 text-center shadow-md">
@@ -78,6 +82,8 @@ function CancelAppointment() {
       </div>
     );
   }
+
+  const declined = needsNewTime(appointment as Appointment);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-8">
@@ -97,13 +103,28 @@ function CancelAppointment() {
             <p className="mt-2 text-sm text-gray-500">Are you sure you want to cancel this appointment?</p>
           </div>
 
+          {/* If it was declined, offer the better option first */}
+          {declined ? (
+            <div className="mb-6 rounded-xl border border-orange-200 bg-orange-50 p-5">
+              <p className="text-sm leading-6 text-orange-800">
+                This appointment was declined, so you can simply choose another time instead of cancelling it altogether.
+              </p>
+              <button
+                onClick={() => navigate(`/appointments/${id}/reschedule`)}
+                className="mt-4 w-full rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600"
+              >
+                Pick another time instead →
+              </button>
+            </div>
+          ) : null}
+
           <div className="rounded-xl bg-pink-50 p-4">
-            <h2 className="font-bold text-gray-800">{professionalName(appointment)}</h2>
-            <p className="text-sm text-gray-500">{specialtyOf(appointment)}</p>
+            <h2 className="font-bold text-gray-800">{professionalName(appointment as Appointment)}</h2>
+            <p className="text-sm text-gray-500">{specialtyOf(appointment as Appointment)}</p>
             <div className="mt-3 space-y-1 text-sm text-gray-600">
-              <p>📅 {formatDate(appointment.scheduledAt, "long")}</p>
-              <p>🕐 {toSlotLabel(appointment.scheduledAt)}</p>
-              <p>💬 {consultationLabel(appointment)}</p>
+              <p>📅 {formatDate((appointment as Appointment).scheduledAt, "long")}</p>
+              <p>🕐 {toSlotLabel((appointment as Appointment).scheduledAt)}</p>
+              <p>💬 {consultationLabel(appointment as Appointment)}</p>
             </div>
           </div>
 
@@ -117,7 +138,7 @@ function CancelAppointment() {
               onChange={(e) => setReason(e.target.value)}
               placeholder="Tell us why you are cancelling..."
               rows={4}
-              className="w-full rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-pink-400"
+              className="w-full resize-none rounded-xl border border-gray-200 px-4 py-3 text-sm outline-none focus:border-pink-400"
             />
           </div>
 

@@ -8,6 +8,7 @@ import {
   professionalName,
   specialtyOf,
   consultationLabel,
+  needsNewTime,
   toSlotLabel,
   toDateInput,
   to24h,
@@ -37,7 +38,8 @@ function RescheduleAppointment() {
         const found = await getAppointment(id);
         setAppointment(found);
         setDate(toDateInput(found.scheduledAt));
-        setTime(toSlotLabel(found.scheduledAt));
+        // A declined appointment needs a NEW time, so don't pre-select the old one
+        setTime(needsNewTime(found) ? "" : toSlotLabel(found.scheduledAt));
       } catch {
         setAppointment(null);
       } finally {
@@ -56,8 +58,11 @@ function RescheduleAppointment() {
       }
       try {
         const taken = await getBookedSlots(appointment.professionalId, date);
-        // Your own current slot doesn't count as taken
-        const own = toDateInput(appointment.scheduledAt) === date ? toSlotLabel(appointment.scheduledAt) : null;
+        // Your own current slot doesn't count as taken — unless it was declined
+        const own =
+          !needsNewTime(appointment) && toDateInput(appointment.scheduledAt) === date
+            ? toSlotLabel(appointment.scheduledAt)
+            : null;
         setBookedSlots(taken.filter((slot) => slot !== own));
       } catch {
         setBookedSlots([]);
@@ -77,7 +82,7 @@ function RescheduleAppointment() {
     setMessage("");
     try {
       await rescheduleAppointment(id, date, time);
-      setMessage("Appointment successfully rescheduled!");
+      setMessage("New time sent! The professional will confirm it shortly.");
       setTimeout(() => navigate(`/appointments/${id}`), 900);
     } catch (error) {
       setMessage(apiErrorMessage(error, "Could not reschedule this appointment."));
@@ -94,7 +99,10 @@ function RescheduleAppointment() {
     );
   }
 
-  if (!appointment || uiStatus(appointment) !== "Upcoming") {
+  // Upcoming appointments can be moved; declined ones must be
+  const canReschedule = appointment && ["Upcoming", "Declined"].includes(uiStatus(appointment));
+
+  if (!canReschedule) {
     return (
       <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-8">
         <div className="mx-auto max-w-2xl rounded-2xl bg-white p-8 text-center shadow-md">
@@ -113,6 +121,8 @@ function RescheduleAppointment() {
     );
   }
 
+  const declined = needsNewTime(appointment as Appointment);
+
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-8">
       <div className="mx-auto max-w-2xl">
@@ -125,13 +135,31 @@ function RescheduleAppointment() {
         </button>
 
         <div className="rounded-2xl bg-white p-6 shadow-md">
-          <h1 className="text-3xl font-bold text-gray-800">✏️ Reschedule Appointment</h1>
-          <p className="mt-1 text-sm text-gray-500">Choose a new date and time for your appointment.</p>
+          <h1 className="text-3xl font-bold text-gray-800">
+            {declined ? "🕐 Pick another time" : "✏️ Reschedule Appointment"}
+          </h1>
+          <p className="mt-1 text-sm text-gray-500">
+            {declined
+              ? "The professional isn't available at your original time. Choose one that works for both of you."
+              : "Choose a new date and time for your appointment."}
+          </p>
+
+          {/* Why it was declined */}
+          {declined && appointment?.declineReason ? (
+            <div className="mt-5 rounded-xl border border-orange-200 bg-orange-50 p-4">
+              <p className="text-xs font-semibold uppercase tracking-wide text-orange-600">Their message</p>
+              <p className="mt-1 text-sm italic text-orange-800">"{appointment.declineReason}"</p>
+            </div>
+          ) : null}
 
           <div className="mt-6 rounded-xl bg-pink-50 p-4">
-            <h2 className="font-bold text-gray-800">{professionalName(appointment)}</h2>
-            <p className="text-sm text-gray-500">{specialtyOf(appointment)}</p>
-            <p className="mt-2 text-sm text-gray-600">💬 {consultationLabel(appointment)}</p>
+            <h2 className="font-bold text-gray-800">{professionalName(appointment as Appointment)}</h2>
+            <p className="text-sm text-gray-500">{specialtyOf(appointment as Appointment)}</p>
+            <p className="mt-2 text-sm text-gray-600">💬 {consultationLabel(appointment as Appointment)}</p>
+            <p className="mt-2 text-xs text-gray-500">
+              Originally: {toSlotLabel((appointment as Appointment).scheduledAt)} on{" "}
+              {new Date((appointment as Appointment).scheduledAt).toLocaleDateString("en-GB", { day: "numeric", month: "short", year: "numeric" })}
+            </p>
           </div>
 
           {/* Date */}
@@ -141,7 +169,10 @@ function RescheduleAppointment() {
               type="date"
               value={date}
               min={todayInput()}
-              onChange={(e) => setDate(e.target.value)}
+              onChange={(e) => {
+                setDate(e.target.value);
+                setTime("");
+              }}
               className="w-full rounded-xl border border-gray-200 px-4 py-3 outline-none focus:border-pink-400"
             />
           </div>
@@ -171,6 +202,7 @@ function RescheduleAppointment() {
                 );
               })}
             </div>
+            <p className="mt-2 text-xs text-gray-400">Greyed-out times are already booked.</p>
           </div>
 
           {message ? (
@@ -179,15 +211,15 @@ function RescheduleAppointment() {
 
           <button
             onClick={handleReschedule}
-            disabled={saving}
-            className="mt-6 w-full rounded-xl bg-gradient-to-r from-pink-500 to-purple-500 px-5 py-3 font-semibold text-white shadow-md hover:opacity-90 disabled:opacity-60"
+            disabled={saving || !time}
+            className="mt-6 w-full rounded-xl bg-gradient-to-r from-pink-500 to-purple-600 px-5 py-3 font-semibold text-white shadow-md hover:opacity-90 disabled:opacity-60"
           >
-            {saving ? "Saving..." : "Confirm Reschedule"}
+            {saving ? "Saving..." : declined ? "Send new time" : "Confirm Reschedule"}
           </button>
         </div>
 
         <div className="mt-5 rounded-xl border border-purple-100 bg-purple-50 p-4 text-sm text-purple-700">
-          💡 The professional is notified of the new time, and the change is recorded in the appointment's activity.
+          💡 The professional is notified of the new time and will confirm it. The change is recorded in the appointment's activity.
         </div>
       </div>
     </div>

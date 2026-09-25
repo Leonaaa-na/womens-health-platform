@@ -7,6 +7,7 @@ import {
   specialtyOf,
   consultationLabel,
   isAwaitingConfirmation,
+  needsNewTime,
   toSlotLabel,
   formatDate,
   statusStyle,
@@ -32,9 +33,11 @@ function Appointments() {
     load();
   }, []);
 
+  // Declined ones need the patient to act, so they sit at the top
+  const declined = appointments.filter(needsNewTime);
   const upcomingAppointments = appointments.filter((a) => uiStatus(a) === "Upcoming");
   const pastAppointments = appointments
-    .filter((a) => uiStatus(a) !== "Upcoming")
+    .filter((a) => ["Completed", "Cancelled", "Missed"].includes(uiStatus(a)))
     .sort((a, b) => new Date(b.scheduledAt).getTime() - new Date(a.scheduledAt).getTime());
 
   return (
@@ -58,6 +61,46 @@ function Appointments() {
       </header>
 
       <main className="mx-auto max-w-md space-y-5 px-5 py-6">
+
+        {/* Needs your attention */}
+        {declined.length > 0 ? (
+          <section className="rounded-3xl border-2 border-orange-200 bg-orange-50 p-5">
+            <h2 className="font-bold text-orange-800">⚠️ Please pick another time</h2>
+            <p className="mt-1 text-sm text-orange-700">
+              {declined.length === 1 ? "A professional isn't available" : `${declined.length} professionals aren't available`} at the time you chose.
+            </p>
+
+            <div className="mt-4 space-y-3">
+              {declined.map((a) => (
+                <div key={a.id} className="rounded-2xl bg-white p-4">
+                  <h3 className="font-semibold text-gray-900">{professionalName(a)}</h3>
+                  <p className="mt-1 text-xs text-gray-500">{specialtyOf(a)}</p>
+                  <p className="mt-2 text-sm text-gray-600">
+                    You asked for {formatDate(a.scheduledAt)} at {toSlotLabel(a.scheduledAt)}
+                  </p>
+                  {a.declineReason ? (
+                    <p className="mt-2 rounded-lg bg-orange-50 p-3 text-sm text-orange-700">"{a.declineReason}"</p>
+                  ) : null}
+
+                  <div className="mt-4 flex gap-2">
+                    <button
+                      onClick={() => navigate(`/appointments/${a.id}/reschedule`)}
+                      className="flex-1 rounded-xl bg-orange-500 px-4 py-3 text-sm font-semibold text-white hover:bg-orange-600"
+                    >
+                      Pick another time
+                    </button>
+                    <button
+                      onClick={() => navigate(`/appointments/${a.id}/cancel`)}
+                      className="rounded-xl border border-gray-200 px-4 py-3 text-sm font-semibold text-gray-500 hover:bg-gray-50"
+                    >
+                      Drop it
+                    </button>
+                  </div>
+                </div>
+              ))}
+            </div>
+          </section>
+        ) : null}
 
         {/* Welcome Card */}
         <section className="rounded-3xl bg-pink-600 p-6 text-white shadow-lg">
@@ -149,6 +192,10 @@ function Appointments() {
                     </div>
                   </div>
 
+                  {isAwaitingConfirmation(a) && !a.isPersonal ? (
+                    <p className="mt-3 text-xs text-gray-500">⏳ Waiting for the professional to confirm.</p>
+                  ) : null}
+
                   <div className="mt-3 flex items-center justify-between">
                     <span className="text-xs text-gray-500">💬 {consultationLabel(a)}</span>
                     <button
@@ -171,10 +218,7 @@ function Appointments() {
               <h2 className="text-lg font-bold text-gray-900">Recent Activity</h2>
               <p className="mt-1 text-sm text-gray-500">Your latest appointment activity</p>
             </div>
-            <button
-              onClick={() => navigate("/appointments/history")}
-              className="text-sm font-semibold text-pink-600"
-            >
+            <button onClick={() => navigate("/appointments/history")} className="text-sm font-semibold text-pink-600">
               View All
             </button>
           </div>
@@ -208,10 +252,10 @@ function Appointments() {
           <div className="flex gap-3">
             <div className="flex h-10 w-10 shrink-0 items-center justify-center rounded-full bg-blue-100 text-lg">💡</div>
             <div>
-              <h2 className="font-bold text-gray-900">Keep your appointments up to date</h2>
+              <h2 className="font-bold text-gray-900">How booking works</h2>
               <p className="mt-1 text-sm leading-6 text-gray-500">
-                You'll get a reminder the day before each appointment. Completed, cancelled and missed appointments
-                remain in your history.
+                When you book, the professional confirms or suggests you pick another time. You'll be notified either way, and
+                you'll get a reminder the day before.
               </p>
             </div>
           </div>

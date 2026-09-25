@@ -7,6 +7,7 @@ import {
   specialtyOf,
   consultationLabel,
   isAwaitingConfirmation,
+  needsNewTime,
   toSlotLabel,
   formatDate,
   statusStyle,
@@ -19,6 +20,7 @@ const actionLabel: Record<string, string> = {
   rescheduled: "Rescheduled",
   cancelled: "Cancelled",
   completed: "Completed",
+  declined: "Declined by professional",
 };
 
 function AppointmentDetails() {
@@ -71,6 +73,7 @@ function AppointmentDetails() {
   }
 
   const status = uiStatus(appointment);
+  const declined = needsNewTime(appointment);
 
   return (
     <div className="min-h-screen bg-gradient-to-br from-pink-50 via-white to-purple-50 px-4 py-8">
@@ -88,15 +91,34 @@ function AppointmentDetails() {
           <p className="mt-1 text-sm text-gray-500">Her health. Her journey. Her bloom.</p>
         </div>
 
+        {/* Declined banner */}
+        {declined ? (
+          <div className="mb-6 rounded-2xl border-2 border-orange-200 bg-orange-50 p-6">
+            <h2 className="text-lg font-bold text-orange-800">⚠️ Please pick another time</h2>
+            <p className="mt-2 text-sm leading-6 text-orange-700">
+              {professionalName(appointment)} isn't available at the time you requested.
+            </p>
+            {appointment.declineReason ? (
+              <p className="mt-3 rounded-xl bg-white p-4 text-sm italic text-gray-700">"{appointment.declineReason}"</p>
+            ) : null}
+            <button
+              onClick={() => navigate(`/appointments/${appointment.id}/reschedule`)}
+              className="mt-4 w-full rounded-xl bg-orange-500 px-5 py-3 font-semibold text-white hover:bg-orange-600"
+            >
+              Pick another time →
+            </button>
+          </div>
+        ) : null}
+
         <div className="overflow-hidden rounded-2xl bg-white shadow-md">
 
           {/* Top Section */}
-          <div className="bg-gradient-to-r from-pink-500 to-purple-500 p-6 text-white">
+          <div className={`p-6 text-white ${declined ? "bg-gradient-to-r from-orange-400 to-orange-500" : "bg-gradient-to-r from-pink-500 to-purple-500"}`}>
             <div className="flex items-start justify-between gap-4">
               <div>
-                <p className="text-sm text-pink-100">Healthcare Professional</p>
+                <p className="text-sm text-white/80">Healthcare Professional</p>
                 <h2 className="mt-1 text-2xl font-bold">{professionalName(appointment)}</h2>
-                <p className="mt-1 text-sm text-pink-100">{specialtyOf(appointment)}</p>
+                <p className="mt-1 text-sm text-white/80">{specialtyOf(appointment)}</p>
               </div>
               <span className="rounded-full bg-white px-3 py-1 text-xs font-bold text-gray-700">{status}</span>
             </div>
@@ -131,7 +153,7 @@ function AppointmentDetails() {
               <span className={`mt-2 inline-block rounded-full px-3 py-1 text-xs font-semibold ${statusStyle(status)}`}>
                 {status}
               </span>
-              {isAwaitingConfirmation(appointment) ? (
+              {isAwaitingConfirmation(appointment) && !appointment.isPersonal ? (
                 <p className="mt-2 text-xs text-gray-500">Waiting for the professional to confirm.</p>
               ) : null}
               {appointment.cancellationReason ? (
@@ -157,7 +179,7 @@ function AppointmentDetails() {
               </div>
             ) : null}
 
-            {appointment.professionalId && status === "Upcoming" ? (
+            {appointment.professionalId && (status === "Upcoming" || declined) ? (
               <button
                 onClick={() => navigate(`/healthcare-professionals/${appointment.professionalId}/chat`)}
                 className="w-full rounded-xl bg-pink-600 px-4 py-3 font-semibold text-white hover:bg-pink-700"
@@ -185,7 +207,7 @@ function AppointmentDetails() {
                 <div className="mt-3 space-y-3">
                   {appointment.history.map((h) => (
                     <div key={h.id} className="flex items-start gap-3 text-sm">
-                      <span className="mt-1 h-2 w-2 shrink-0 rounded-full bg-pink-500"></span>
+                      <span className={`mt-1 h-2 w-2 shrink-0 rounded-full ${h.action === "declined" ? "bg-orange-500" : "bg-pink-500"}`}></span>
                       <div>
                         <p className="font-medium text-gray-800">{actionLabel[h.action] || h.action}</p>
                         <p className="text-xs text-gray-500">
@@ -194,6 +216,7 @@ function AppointmentDetails() {
                             ? ` → ${formatDate(h.newScheduledAt)} ${toSlotLabel(h.newScheduledAt)}`
                             : ""}
                         </p>
+                        {h.reason ? <p className="mt-1 text-xs italic text-gray-500">"{h.reason}"</p> : null}
                       </div>
                     </div>
                   ))}
