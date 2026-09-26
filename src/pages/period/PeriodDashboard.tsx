@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import CycleCalendar from "../../components/CycleCalendar";
+import WeeklyTipBanner from "../../components/WeeklyTipBanner";
 import apiClient from "../../api/client";
 
 interface CycleData {
@@ -181,6 +182,9 @@ function PeriodDashboard() {
             </button>
           )}
         </section>
+
+        {/* This week's health tip — hides itself when nothing is featured */}
+        <WeeklyTipBanner />
 
         {/* Today's Check-in */}
         <section>

@@ -57,8 +57,13 @@ export const getPosts = async (params: { topic?: string; professional?: string; 
     total: number;
   };
 
-export const createPost = async (input: { title: string; content: string; topic: string; isAnonymous: boolean }) =>
-  (await apiClient.post("/community/posts", input)).data.data as CommunityPost;
+export const createPost = async (input: {
+  title: string;
+  content: string;
+  topic: string;
+  isAnonymous: boolean;
+  asProfessional?: boolean;
+}) => (await apiClient.post("/community/posts", input)).data.data as CommunityPost;
 
 export const deletePost = async (id: string) => apiClient.delete(`/community/posts/${id}`);
 

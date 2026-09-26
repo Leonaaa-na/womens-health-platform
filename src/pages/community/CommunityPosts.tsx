@@ -1,6 +1,7 @@
 import { useEffect, useState } from "react";
 import type { FormEvent } from "react";
 import { Link } from "react-router-dom";
+import apiClient from "../../api/client";
 import {
   getPosts,
   createPost,
@@ -27,6 +28,17 @@ export default function CommunityPosts() {
   const [isAnonymous, setIsAnonymous] = useState(false);
   const [saving, setSaving] = useState(false);
   const [message, setMessage] = useState("");
+
+  // Verified professionals choose where their post goes
+  const [canPostAsProfessional, setCanPostAsProfessional] = useState(false);
+  const [asProfessional, setAsProfessional] = useState(true);
+
+  useEffect(() => {
+    apiClient
+      .get("/community/me/can-post-professional")
+      .then((res) => setCanPostAsProfessional(!!res.data.data?.canPostAsProfessional))
+      .catch(() => setCanPostAsProfessional(false));
+  }, []);
 
   // Reload whenever the topic filter changes
   useEffect(() => {
@@ -55,7 +67,14 @@ export default function CommunityPosts() {
     setSaving(true);
     setMessage("");
     try {
-      const created = await createPost({ title: title.trim(), content: content.trim(), topic, isAnonymous });
+      const created = await createPost({
+        title: title.trim(),
+        content: content.trim(),
+        topic,
+        isAnonymous,
+        ...(canPostAsProfessional && { asProfessional }),
+      });
+
       // Show it straight away (the create response has no author details yet)
       const refreshed = await getPosts(selectedTopic === "all" ? {} : { topic: selectedTopic });
       setPosts(refreshed.posts.filter((p) => !p.isProfessionalContent));
@@ -64,8 +83,13 @@ export default function CommunityPosts() {
       setContent("");
       setTopic("general");
       setIsAnonymous(false);
+      setAsProfessional(true);
       setShowForm(false);
-      setMessage(created.isProfessionalContent ? "Published to Professional Health Content 🩺" : "Your post is live 🌸");
+      setMessage(
+        created.isProfessionalContent
+          ? "Published to Professional Health Content 🩺"
+          : "Your post is live 🌸"
+      );
     } catch (error) {
       setMessage(apiErrorMessage(error, "Could not publish your post."));
     } finally {
@@ -181,15 +205,41 @@ export default function CommunityPosts() {
                 />
               </div>
 
-              <label className="flex items-center gap-2 text-sm text-gray-600">
-                <input
-                  type="checkbox"
-                  checked={isAnonymous}
-                  onChange={(e) => setIsAnonymous(e.target.checked)}
-                  className="h-4 w-4 accent-pink-600"
-                />
-                Post anonymously (your name won't be shown)
-              </label>
+              {/* Verified professionals decide where it goes */}
+              {canPostAsProfessional ? (
+                <div className="rounded-xl border border-purple-200 bg-purple-50 p-4">
+                  <p className="text-sm font-semibold text-purple-800">🩺 You're posting as a verified professional</p>
+                  <label className="mt-3 flex items-start gap-2 text-sm text-gray-700">
+                    <input
+                      type="checkbox"
+                      checked={asProfessional}
+                      onChange={(e) => setAsProfessional(e.target.checked)}
+                      className="mt-1 h-4 w-4 accent-purple-600"
+                    />
+                    <span>
+                      Publish as <b>Professional Health Content</b>
+                      <span className="block text-xs text-gray-500">
+                        {asProfessional
+                          ? "Appears on the Professional Health Content page with your verified badge."
+                          : "Posts as a normal community discussion, like any other member."}
+                      </span>
+                    </span>
+                  </label>
+                </div>
+              ) : null}
+
+              {/* Anonymous isn't possible for professional content */}
+              {!canPostAsProfessional || !asProfessional ? (
+                <label className="flex items-center gap-2 text-sm text-gray-600">
+                  <input
+                    type="checkbox"
+                    checked={isAnonymous}
+                    onChange={(e) => setIsAnonymous(e.target.checked)}
+                    className="h-4 w-4 accent-pink-600"
+                  />
+                  Post anonymously (your name won't be shown)
+                </label>
+              ) : null}
 
               <button
                 type="submit"
