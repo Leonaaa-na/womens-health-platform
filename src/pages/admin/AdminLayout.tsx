@@ -6,6 +6,7 @@ const TABS = [
   { path: "/admin", label: "Dashboard", icon: "📊", exact: true },
   { path: "/admin/users", label: "Users", icon: "👥" },
   { path: "/admin/appointments", label: "Appointments", icon: "📅" },
+  { path: "/admin/articles", label: "Articles", icon: "📰" },
   { path: "/admin/professionals", label: "Verifications", icon: "🩺" },
   { path: "/admin/messages", label: "Messages", icon: "✉️" },
   { path: "/admin/payments", label: "Payments", icon: "💳" },

@@ -99,6 +99,7 @@ import AdminLayout from "../pages/admin/AdminLayout";
 import AdminDashboard from "../pages/admin/AdminDashboard";
 import AdminUsers from "../pages/admin/AdminUsers";
 import AdminAppointments from "../pages/admin/AdminAppointments";
+import AdminArticles from "../pages/admin/AdminArticles";
 import AdminProfessionals from "../pages/admin/AdminProfessionals";
 import AdminMessages from "../pages/admin/AdminMessages";
 import AdminPayments from "../pages/admin/AdminPayments";
@@ -223,6 +224,7 @@ function AppRoutes() {
               <Route index element={<AdminDashboard />} />
               <Route path="users" element={<AdminUsers />} />
               <Route path="appointments" element={<AdminAppointments />} />
+              <Route path="articles" element={<AdminArticles />} />
               <Route path="professionals" element={<AdminProfessionals />} />
               <Route path="messages" element={<AdminMessages />} />
               <Route path="payments" element={<AdminPayments />} />
